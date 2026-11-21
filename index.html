@@ -356,6 +356,11 @@
       background: #eef1f6;
       color: #172033;
     }
+
+        .listing p {
+      white-space: pre-line;
+    }
+
   </style>
 
 
@@ -483,7 +488,7 @@
     async function loadListings() {
       const { data, error } = await supabaseClient
         .from("listings")
-        .select(`
+                .select(`
           id,
           title,
           direction,
@@ -492,6 +497,7 @@
           travel_date,
           capacity_kg,
           price_per_kg,
+          price_per_bag,
           currency,
           description,
           contact_url
@@ -572,26 +578,49 @@ document.getElementById("resultCount").textContent =
         const date = document.createElement("p");
         const travelDate = new Date(item.travel_date + "T00:00:00");
 
-const formattedDate = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
-  day: "numeric",
-  month: "long",
-  year: "numeric"
-}).format(travelDate);
+        const formattedDate = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }).format(travelDate);
 
-date.textContent = "วันเดินทาง: " + formattedDate;
+        date.textContent = "วันเดินทาง: " + formattedDate;
 
-        const capacity = document.createElement("p");
-        capacity.textContent =
-          "พื้นที่: " + (item.capacity_kg ?? "-") + " กก.";
+        let capacity = null;
+        if (item.capacity_kg != null) {
+          capacity = document.createElement("p");
+          capacity.textContent = "พื้นที่: " + item.capacity_kg + " กก.";
+        }
 
-        const price = document.createElement("p");
-        price.textContent =
-          "ราคา: " + (item.price_per_kg ?? "-") +
-          " " + (item.currency || "");
+        const priceParts = [];
+        const currencyText = item.currency || "";
 
-        const description = document.createElement("p");
-        description.textContent =
-          "รายละเอียด: " + (item.description || "-");
+        if (item.price_per_kg != null) {
+          priceParts.push(
+            Number(item.price_per_kg).toLocaleString("en-US") +
+            " " + currencyText + " / กก."
+          );
+        }
+
+        if (item.price_per_bag != null) {
+          priceParts.push(
+            Number(item.price_per_bag).toLocaleString("en-US") +
+            " " + currencyText + " / ใบ"
+          );
+        }
+
+        let price = null;
+        if (priceParts.length) {
+          price = document.createElement("p");
+          price.textContent = "ราคา: " + priceParts.join(" หรือ ");
+        }
+
+        let description = null;
+        const descriptionText = (item.description || "").trim();
+        if (descriptionText) {
+          description = document.createElement("p");
+          description.textContent = "รายละเอียด: " + descriptionText;
+        }
 
         const detail = document.createElement("a");
         detail.className = "contact view-detail";
@@ -599,14 +628,8 @@ date.textContent = "วันเดินทาง: " + formattedDate;
         detail.textContent = "ดูรายละเอียด";
 
         card.append(
-          title,
-          direction,
-          route,
-          date,
-          capacity,
-          price,
-          description,
-          detail
+          ...[title, direction, route, date, capacity, price, description, detail]
+            .filter(Boolean)
         );
 
         if (item.contact_url) {

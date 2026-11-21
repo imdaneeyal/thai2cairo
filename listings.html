@@ -12,7 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="assets/js/supabase.js"></script>
-  <script src="assets/js/supabase.js"></script>
 
   <style>
     * {
@@ -134,6 +133,16 @@ select.search-box {
   color: #666;
 }
 
+    .result-count {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .listing .detail {
+      white-space: pre-line;
+    }
+
   </style>
 </head>
 
@@ -182,6 +191,9 @@ select.search-box {
   <option value="price_bag">เรียงตาม: ราคาต่อใบ (ต่ำสุด)</option>
 </select>
 <p class="result-count" id="resultCount"></p>
+
+
+
     <div id="listingContainer">
       <div class="message">กำลังโหลดประกาศ...</div>
     </div>
@@ -249,7 +261,8 @@ async function loadListings() {
       category,
       description,
       contact_method,
-      contact_url
+      contact_url,
+      source_url
     `)
     .eq("status", "approved")
     .gte("travel_date", new Date().toISOString().slice(0, 10));
@@ -368,13 +381,13 @@ document.getElementById("resultCount").textContent =
 
     date.textContent = "วันเดินทาง: " + formattedDate;
 
-    const capacity = document.createElement("p");
-    capacity.className = "detail";
-    capacity.textContent =
-      "พื้นที่: " + (item.capacity_kg ?? "-") + " กก.";
+        let capacity = null;
+    if (item.capacity_kg != null) {
+      capacity = document.createElement("p");
+      capacity.className = "detail";
+      capacity.textContent = "พื้นที่: " + item.capacity_kg + " กก.";
+    }
 
-    const price = document.createElement("p");
-    price.className = "detail";
         const priceParts = [];
     const currencyText = item.currency || "";
 
@@ -392,13 +405,20 @@ document.getElementById("resultCount").textContent =
       );
     }
 
-    price.textContent =
-      "ราคา: " + (priceParts.length ? priceParts.join(" หรือ ") : "-");
+    let price = null;
+    if (priceParts.length) {
+      price = document.createElement("p");
+      price.className = "detail";
+      price.textContent = "ราคา: " + priceParts.join(" หรือ ");
+    }
 
-    const description = document.createElement("p");
-    description.className = "detail";
-    description.textContent =
-      "รายละเอียด: " + (item.description || "-");
+        let description = null;
+    const descriptionText = (item.description || "").trim();
+    if (descriptionText) {
+      description = document.createElement("p");
+      description.className = "detail";
+      description.textContent = "รายละเอียด: " + descriptionText;
+    }
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -428,16 +448,26 @@ document.getElementById("resultCount").textContent =
         // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
       }
     }
+    if (item.source_url && item.source_url.includes("facebook.com")) {
+      try {
+        const profileUrl = new URL(item.source_url);
 
-    card.append(
-      title,
-      direction,
-      route,
-      date,
-      capacity,
-      price,
-      description,
-      actions
+        if (profileUrl.protocol === "https:" || profileUrl.protocol === "http:") {
+          const profile = document.createElement("a");
+          profile.className = "view-detail";
+          profile.href = profileUrl.href;
+          profile.target = "_blank";
+          profile.rel = "noopener noreferrer";
+          profile.textContent = "Facebook";
+          actions.appendChild(profile);
+        }
+      } catch (e) {
+        // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
+      }
+    }
+        card.append(
+      ...[title, direction, route, date, capacity, price, description, actions]
+        .filter(Boolean)
     );
 
     listingContainer.appendChild(card);
