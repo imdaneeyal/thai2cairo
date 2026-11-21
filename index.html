@@ -502,10 +502,9 @@
           description,
           contact_url
         `)
-        .eq("status", "approved")
+                .eq("status", "approved")
         .gte("travel_date", new Date().toISOString().slice(0, 10))
-        .order("created_at", { ascending: false });
-
+        .order("travel_date", { ascending: true });
       if (error) {
         listingContainer.innerHTML = "";
         const message = document.createElement("div");
@@ -543,7 +542,7 @@
 
 document.getElementById("resultCount").textContent =
   "พบ " + results.length.toLocaleString("th-TH") + " รายการ" +
-  (results.length > 6 ? " (แสดง 6 รายการล่าสุด)" : "");
+    (results.length > 6 ? " (แสดง 6 รายการที่เดินทางใกล้สุด)" : "");
 
       listingContainer.innerHTML = "";
 

@@ -499,7 +499,30 @@ function formatDate(dateString) {
       descriptionTitle.className = "section-title";
       descriptionTitle.textContent = "รายละเอียดเพิ่มเติม";
 
-      const description = document.createElement("p");
+          const infoLines = [];
+
+    if (item.poster_type === "traveler") {
+      infoLines.push("ประเภทผู้โพสต์: ผู้เดินทางเอง");
+    } else if (item.poster_type === "agent") {
+      infoLines.push("ประเภทผู้โพสต์: ผ่านตัวแทน");
+    }
+
+    if (item.dropoff_point) {
+      infoLines.push("จุดฝาก: " + item.dropoff_point);
+    }
+
+    if (item.pickup_point) {
+      infoLines.push("จุดรับสินค้า: " + item.pickup_point);
+    }
+
+    const infoElements = infoLines.map(function (text) {
+      const line = document.createElement("p");
+      line.className = "detail";
+      line.textContent = text;
+      return line;
+    });
+
+    const description = document.createElement("p");
       description.className = "description";
       description.textContent = item.description;
 

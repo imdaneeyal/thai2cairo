@@ -85,7 +85,31 @@ select.search-box {
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-        .listing h3 {
+            .listing {
+      position: relative;
+    }
+
+    .detail-icon {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef1f6;
+      color: #172033;
+      border-radius: 50%;
+      text-decoration: none;
+    }
+
+    .detail-icon:hover {
+      background: #dde3ee;
+    }
+
+    .listing h3 {
+      padding-right: 52px;
       margin-top: 0;
       color: #172033;
     }
@@ -256,13 +280,15 @@ async function loadListings() {
       capacity_kg,
       price_per_kg,
       price_per_bag,
-      poster_type,
+            poster_type,
+      dropoff_point,
+      pickup_point,
+      source_url,
       currency,
       category,
       description,
       contact_method,
-      contact_url,
-      source_url
+      contact_url
     `)
     .eq("status", "approved")
     .gte("travel_date", new Date().toISOString().slice(0, 10));
@@ -293,7 +319,7 @@ function renderListings() {
       item.origin,
       item.destination,
       item.description
-    ].join(" ").toLowerCase();
+        ].concat([item.dropoff_point, item.pickup_point]).join(" ").toLowerCase();
 
     const matchesKeyword =
       !keyword || searchableText.includes(keyword);
@@ -381,7 +407,30 @@ document.getElementById("resultCount").textContent =
 
     date.textContent = "วันเดินทาง: " + formattedDate;
 
-        let capacity = null;
+            const infoLines = [];
+
+    if (item.poster_type === "traveler") {
+      infoLines.push("ประเภทผู้โพสต์: ผู้เดินทางเอง");
+    } else if (item.poster_type === "agent") {
+      infoLines.push("ประเภทผู้โพสต์: ผ่านตัวแทน");
+    }
+
+    if (item.dropoff_point) {
+      infoLines.push("จุดฝาก: " + item.dropoff_point);
+    }
+
+    if (item.pickup_point) {
+      infoLines.push("จุดรับสินค้า: " + item.pickup_point);
+    }
+
+    const infoElements = infoLines.map(function (text) {
+      const line = document.createElement("p");
+      line.className = "detail";
+      line.textContent = text;
+      return line;
+    });
+
+    let capacity = null;
     if (item.capacity_kg != null) {
       capacity = document.createElement("p");
       capacity.className = "detail";
@@ -423,13 +472,19 @@ document.getElementById("resultCount").textContent =
     const actions = document.createElement("div");
     actions.className = "actions";
 
-    const viewDetail = document.createElement("a");
-    viewDetail.className = "view-detail";
+        const viewDetail = document.createElement("a");
+    viewDetail.className = "detail-icon";
     viewDetail.href =
       "listing-detail.html?id=" + encodeURIComponent(item.id);
-    viewDetail.textContent = "ดูรายละเอียด";
+    viewDetail.setAttribute("aria-label", "ดูรายละเอียด");
+    viewDetail.title = "ดูรายละเอียด";
+    viewDetail.innerHTML =
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="2.5" stroke-linecap="round" ' +
+      'stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>';
 
-    actions.appendChild(viewDetail);
+    card.appendChild(viewDetail);
 
     if (item.contact_url) {
       try {
@@ -441,7 +496,7 @@ document.getElementById("resultCount").textContent =
           contact.href = url.href;
           contact.target = "_blank";
           contact.rel = "noopener noreferrer";
-          contact.textContent = "ติดต่อผู้ประกาศ";
+          contact.textContent = "แชท";
           actions.appendChild(contact);
         }
       } catch (e) {
@@ -458,7 +513,7 @@ document.getElementById("resultCount").textContent =
           profile.href = profileUrl.href;
           profile.target = "_blank";
           profile.rel = "noopener noreferrer";
-          profile.textContent = "Facebook";
+          profile.textContent = "โปรไฟล์";
           actions.appendChild(profile);
         }
       } catch (e) {
@@ -466,7 +521,7 @@ document.getElementById("resultCount").textContent =
       }
     }
         card.append(
-      ...[title, direction, route, date, capacity, price, description, actions]
+      ...[title, direction, route, date, ...infoElements, capacity, price, description, actions]
         .filter(Boolean)
     );
 

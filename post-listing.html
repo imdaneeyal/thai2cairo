@@ -210,6 +210,36 @@
       background: #176b9a;
     }
 
+  
+    .help-box {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .help-box summary {
+      cursor: pointer;
+      color: #176b9a;
+      font-weight: bold;
+    }
+
+    .help-box p {
+      margin: 10px 0 4px;
+    }
+
+    .help-box ol,
+    .help-box ul {
+      margin: 4px 0 10px;
+      padding-left: 22px;
+    }
+
+    .help-box code {
+      background: #f3f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      overflow-wrap: anywhere;
+    }
   </style>
 </head>
 
@@ -395,38 +425,47 @@
         ></textarea>
       </div>
 
-      <div class="field">
-        <label>ช่องทางติดต่อ</label>
-        <select id="contactMethod">
-          <option value="">เลือกช่องทางติดต่อ</option>
-          <option value="Facebook">Facebook</option>
-          <option value="Messenger">Messenger</option>
-          <option value="WhatsApp">WhatsApp</option>
-          <option value="LINE">LINE</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>ลิงก์สำหรับติดต่อ</label>
+            <div class="field">
+        <label>ลิงก์โปรไฟล์ Facebook <span class="required">*</span></label>
         <input
           type="url"
-          id="contactUrl"
-          placeholder="https://..."
-        >
-        <div class="hint">
-          เช่น ลิงก์ Facebook, Messenger หรือ WhatsApp
-        </div>
-      </div>
-
-      <div class="field">
-        <label>ลิงก์โพสต์ต้นฉบับ (ไม่บังคับ)</label>
-        <input
-          type="url"
-          id="sourceUrl"
+          id="facebookProfile"
           placeholder="https://www.facebook.com/..."
+          required
         >
         <div class="hint">
-          ใช้สำหรับให้ Admin ตรวจสอบที่มาของประกาศ ไม่แสดงต่อสาธารณะ
+          เปิดโปรไฟล์ของคุณใน Facebook แล้วคัดลอกลิงก์จากแถบที่อยู่มาวางที่นี่
+          ลิงก์นี้จะแสดงต่อสาธารณะเป็นปุ่ม "โปรไฟล์" และใช้สร้างปุ่มแชทให้อัตโนมัติ
+                    ผู้สนใจจะติดต่อคุณผ่าน Facebook เท่านั้น
+
+          <details class="help-box">
+            <summary>ไม่รู้จะหาลิงก์ที่ไหน? ดูวิธี</summary>
+
+            <p><strong>บนคอมพิวเตอร์</strong></p>
+            <ol>
+              <li>เปิด facebook.com แล้วเข้าสู่ระบบ</li>
+              <li>กดชื่อของคุณเพื่อเข้าหน้าโปรไฟล์</li>
+              <li>คัดลอกลิงก์จากแถบที่อยู่ด้านบนสุดของเบราว์เซอร์</li>
+            </ol>
+
+            <p><strong>บนมือถือ</strong></p>
+            <ol>
+              <li>เปิดเบราว์เซอร์ (Chrome หรือ Safari) แล้วไปที่ facebook.com เข้าสู่ระบบ</li>
+              <li>เข้าหน้าโปรไฟล์ของคุณ</li>
+              <li>แตะแถบที่อยู่ด้านบน แล้วเลือกคัดลอก</li>
+            </ol>
+
+            <p><strong>ลิงก์ที่ใช้ได้ มีหน้าตาแบบนี้</strong></p>
+            <ul>
+              <li><code>https://www.facebook.com/profile.php?id=1000XXXXXXXXXXX</code></li>
+              <li><code>https://www.facebook.com/ชื่อผู้ใช้ของคุณ</code></li>
+            </ul>
+
+            <p>
+              <strong>ถ้าลิงก์ที่ได้มีคำว่า /share/</strong> ระบบรับไม่ได้
+              ให้เปิดลิงก์นั้นในเบราว์เซอร์ แล้วคัดลอกลิงก์จากแถบที่อยู่อีกครั้ง
+            </p>
+          </details>
         </div>
       </div>
 
@@ -454,6 +493,59 @@
   ].join("-");
 
     travelDate.min = localToday;
+
+      function parseFacebookProfile(input) {
+    let url;
+
+    try {
+      url = new URL((input || "").trim());
+    } catch (e) {
+      return null;
+    }
+
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+
+    const host = url.hostname
+      .toLowerCase()
+      .replace(/^(www|m|web|mbasic)\./, "");
+
+    if (host !== "facebook.com" && host !== "fb.com") return null;
+
+    const segments = url.pathname.split("/").filter(Boolean);
+    const reserved = [
+      "share", "groups", "pages", "watch", "story.php", "photo",
+      "photo.php", "permalink.php", "login", "marketplace", "events",
+      "reel", "reels", "hashtag", "sharer", "l.php"
+    ];
+
+    let id = null;
+    let isNumeric = false;
+
+    if (url.pathname === "/profile.php") {
+      id = url.searchParams.get("id");
+      isNumeric = true;
+    } else if (segments[0] === "people" && segments.length >= 3) {
+      id = segments[2];
+      isNumeric = true;
+    } else if (
+      segments.length === 1 &&
+      !reserved.includes(segments[0].toLowerCase())
+    ) {
+      id = segments[0];
+      isNumeric = /^\d+$/.test(id);
+    }
+
+    if (!id) return null;
+    if (isNumeric && !/^\d+$/.test(id)) return null;
+    if (!isNumeric && !/^[A-Za-z0-9.]{5,}$/.test(id)) return null;
+
+    return {
+      profileUrl: isNumeric
+        ? "https://www.facebook.com/profile.php?id=" + id
+        : "https://www.facebook.com/" + id,
+      chatUrl: "https://m.me/" + id
+    };
+  }
 
     function formatThaiShortDate(dateString) {
     const date = new Date(dateString + "T00:00:00");
@@ -616,15 +708,6 @@
     const priceValue =
       document.getElementById("price").value;
 
-    const contactUrl =
-      document.getElementById("contactUrl").value.trim();
-
-        const sourceUrl =
-      document.getElementById("sourceUrl").value.trim();
-
-    const contactMethodValue =
-      document.getElementById("contactMethod").value;
-
         const deadlineValue =
       document.getElementById("dropoffDeadline").value;
 
@@ -641,10 +724,15 @@
     }
 
     // ตรวจสอบก่อนส่ง
-    if (!contactMethodValue || !contactUrl) {
+        const fb = parseFacebookProfile(
+      document.getElementById("facebookProfile").value
+    );
+
+    if (!fb) {
       message.style.color = "#d62828";
       message.textContent =
-        "กรุณาเลือกช่องทางติดต่อและใส่ลิงก์สำหรับติดต่อ เพื่อให้ผู้สนใจติดต่อคุณได้";
+        "ลิงก์ Facebook ไม่ถูกต้อง กรุณาเปิดโปรไฟล์ของคุณในเบราว์เซอร์ " +
+        "แล้วคัดลอกลิงก์จากแถบที่อยู่ (ลิงก์ที่มีคำว่า /share/ ใช้ไม่ได้)";
       submitButton.disabled = false;
       submitButton.textContent = "ส่งประกาศเพื่อตรวจสอบ";
       return;
@@ -664,9 +752,9 @@
           p_currency: document.getElementById("currency").value,
           p_category: document.getElementById("category").value,
           p_description: buildDescription(),
-          p_contact_method: document.getElementById("contactMethod").value || null,
-          p_contact_url: contactUrl || null,
-                    p_source_url: sourceUrl || null,
+                    p_contact_method: "Messenger",
+          p_contact_url: fb.chatUrl,
+          p_source_url: fb.profileUrl,
           p_price_per_bag:
             document.getElementById("priceBag").value === ""
               ? null
