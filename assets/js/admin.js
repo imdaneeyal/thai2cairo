@@ -14,6 +14,32 @@ const reasonLabels = {
   "expired": "ประกาศหมดอายุหรือไม่ว่างแล้ว",
   "other": "อื่น ๆ"
 };
+const posterLabels = {
+  "traveler": "ผู้เดินทางเอง",
+  "agent": "ผ่านตัวแทน"
+};
+
+function formatPriceText(item) {
+  const currency = item.currency || "";
+  const parts = [];
+
+  if (item.price_per_kg != null) {
+    parts.push(
+      Number(item.price_per_kg).toLocaleString("en-US") +
+      " " + currency + " / กก."
+    );
+  }
+
+  if (item.price_per_bag != null) {
+    parts.push(
+      Number(item.price_per_bag).toLocaleString("en-US") +
+      " " + currency + " / ใบ"
+    );
+  }
+
+  return parts.length ? parts.join(" หรือ ") : "-";
+}
+
 // ตรวจสอบสิทธิ์ Admin
 async function verifyAdmin() {
   const { data: { user }, error } =
@@ -84,6 +110,16 @@ async function loadListings() {
     const date = document.createElement("p");
     date.textContent = `วันเดินทาง: ${item.travel_date || "-"}`;
 
+        const capacity = document.createElement("p");
+    capacity.textContent = `พื้นที่: ${item.capacity_kg ?? "-"} กก.`;
+
+    const price = document.createElement("p");
+    price.textContent = `ราคา: ${formatPriceText(item)}`;
+
+    const poster = document.createElement("p");
+    poster.textContent =
+      `ประเภทผู้โพสต์: ${posterLabels[item.poster_type] || "ไม่ระบุ"}`;
+
     const description = document.createElement("p");
     description.textContent = `รายละเอียด: ${item.description || "-"}`;
 
@@ -113,7 +149,17 @@ async function loadListings() {
     rejectButton.addEventListener("click", () => updateStatus(item.id, "rejected"));
 
     actions.append(approveButton, rejectButton);
-    card.append(title, details, date, description, contact, actions);
+        card.append(
+      title,
+      details,
+      date,
+      capacity,
+      price,
+      poster,
+      description,
+      contact,
+      actions
+    );
     listingContainer.appendChild(card);
   });
 }
@@ -229,7 +275,7 @@ async function loadApprovedListings() {
 
   const { data, error } = await supabaseClient
     .from("listings")
-    .select("id, title, direction, origin, destination, travel_date")
+        .select("id, title, direction, origin, destination, travel_date, capacity_kg, price_per_kg")
     .eq("status", "approved")
     .order("created_at", { ascending: false });
 
@@ -262,6 +308,10 @@ async function loadApprovedListings() {
     const date = document.createElement("p");
     date.textContent = `วันเดินทาง: ${item.travel_date || "-"}`;
 
+        const stock = document.createElement("p");
+    stock.textContent =
+      `น้ำหนัก: ${item.capacity_kg ?? "-"} กก. | ราคา: ${item.price_per_kg ?? "-"}`;
+
     const link = document.createElement("p");
     const anchor = document.createElement("a");
     anchor.href = "../listing-detail.html?id=" + encodeURIComponent(item.id);
@@ -278,15 +328,84 @@ async function loadApprovedListings() {
     takeDownButton.textContent = "ถอดประกาศ";
     takeDownButton.addEventListener("click", () => takeDownListing(item.id));
 
-    actions.appendChild(takeDownButton);
-    card.append(title, route, date, link, actions);
+        const fullButton = document.createElement("button");
+    fullButton.className = "approve";
+    fullButton.textContent = "เต็มแล้ว / ปิดประกาศ";
+    fullButton.addEventListener("click", () =>
+      takeDownListing(
+        item.id,
+        "ยืนยันว่าประกาศนี้เต็มแล้วหรือไม่? ประกาศจะหายจากหน้าสาธารณะ",
+        "ปิดประกาศเรียบร้อย"
+      )
+    );
+
+        const editButton = document.createElement("button");
+    editButton.className = "dismiss";
+    editButton.textContent = "แก้ราคา / น้ำหนัก";
+    editButton.addEventListener("click", () => editListing(item));
+
+    actions.append(editButton, fullButton, takeDownButton);
+        card.append(title, route, date, stock, link, actions);
     approvedContainer.appendChild(card);
   });
 }
 
+// แก้ราคา / น้ำหนักของประกาศ
+async function editListing(item) {
+  const priceInput = prompt(
+    "ราคาต่อหน่วยใหม่ (เว้นว่างไว้ = ไม่เปลี่ยน)",
+    item.price_per_kg ?? ""
+  );
+  if (priceInput === null) return;
+
+  const capacityInput = prompt(
+    "น้ำหนักที่เหลือ (กก.) (เว้นว่างไว้ = ไม่เปลี่ยน)",
+    item.capacity_kg ?? ""
+  );
+  if (capacityInput === null) return;
+
+  const updates = {};
+
+  if (priceInput.trim() !== "") {
+    const price = Number(priceInput);
+    if (!Number.isFinite(price) || price < 0) {
+      alert("ราคาไม่ถูกต้อง");
+      return;
+    }
+    updates.price_per_kg = price;
+  }
+
+  if (capacityInput.trim() !== "") {
+    const capacity = Number(capacityInput);
+    if (!Number.isFinite(capacity) || capacity <= 0) {
+      alert("น้ำหนักต้องมากกว่า 0 (ถ้าเต็มแล้ว ให้ใช้ปุ่ม เต็มแล้ว / ปิดประกาศ)");
+      return;
+    }
+    updates.capacity_kg = capacity;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("listings")
+    .update(updates)
+    .eq("id", item.id);
+
+  if (error) {
+    console.error("edit listing error:", error);
+    alert("แก้ไขไม่สำเร็จ: " + error.message);
+    return;
+  }
+
+  alert("แก้ไขเรียบร้อย");
+  loadApprovedListings();
+}
+
 // ถอดประกาศที่ถูกรายงานออกจากหน้าสาธารณะ
-async function takeDownListing(listingId) {
-  if (!confirm("ยืนยันการถอดประกาศนี้ออกจากหน้าสาธารณะหรือไม่?")) {
+async function takeDownListing(listingId, confirmText, successText) {
+  if (!confirm(confirmText || "ยืนยันการถอดประกาศนี้ออกจากหน้าสาธารณะหรือไม่?")) {
     return;
   }
 
@@ -307,7 +426,7 @@ async function takeDownListing(listingId) {
     return;
   }
 
-    alert("ถอดประกาศเรียบร้อย");
+      alert(successText || "ถอดประกาศเรียบร้อย");
   loadListings();
   loadReports();
   loadApprovedListings();

@@ -7,6 +7,11 @@
   <title>ประกาศทั้งหมด | Thai2Cairo</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="assets/js/supabase.js"></script>
   <script src="assets/js/supabase.js"></script>
 
   <style>
@@ -17,9 +22,9 @@
     body {
       margin: 0;
       padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f3f5f9;
-      color: #222;
+            font-family: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
     }
 
     .container {
@@ -27,19 +32,30 @@
       margin: auto;
     }
 
+        .page-header {
+      background: linear-gradient(135deg, #173b70, #2878a8);
+      color: white;
+      padding: 34px 20px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
     h1 {
-      margin-bottom: 8px;
-      color: #1d3557;
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 700;
+      color: white;
     }
 
     .subtitle {
-      color: #777;
-      margin-bottom: 25px;
+      margin: 0;
+      opacity: 0.9;
     }
 
 .search-box {
   width: 100%;
-  padding: 13px 15px;
+    padding: 13px 15px;
+  font-family: inherit;
   margin-bottom: 20px;
   border: 1px solid #dce5f0;
   border-radius: 8px;
@@ -49,7 +65,7 @@
 }
 
 .search-box:focus {
-  border-color: #1d3557;
+    border-color: #2878a8;
 }
 
 select.search-box {
@@ -57,7 +73,7 @@ select.search-box {
   -webkit-appearance: none;
   padding-right: 42px;
   cursor: pointer;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d3557' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23176b9a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
@@ -70,9 +86,9 @@ select.search-box {
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    .listing h3 {
+        .listing h3 {
       margin-top: 0;
-      color: #1d3557;
+      color: #172033;
     }
 
     .detail {
@@ -87,20 +103,21 @@ select.search-box {
       margin-top: 15px;
     }
 
-    .contact,
+        .contact,
     .view-detail {
       display: inline-block;
-      padding: 10px 16px;
-      background: #1d3557;
+      padding: 11px 18px;
+      background: #172033;
       color: white;
       text-decoration: none;
-      border-radius: 7px;
+      border-radius: 10px;
+      font-weight: 600;
     }
 
     .view-detail {
-      background: #eaf0f7;
-      color: #1d3557;
-      border: 1px solid #dce5f0;
+      background: #eef1f6;
+      color: #172033;
+      border: none;
     }
 
     .message {
@@ -110,15 +127,24 @@ select.search-box {
       background: white;
       border-radius: 10px;
     }
+
+.result-count {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #666;
+}
+
   </style>
 </head>
 
 <body>
   <main class="container">
-    <h1 id="pageTitle">ประกาศทั้งหมด</h1>
-<p class="subtitle" id="pageSubtitle">
-  ค้นหาประกาศฝากหิ้วและบริการระหว่างไทย - อียิปต์
-</p>
+        <header class="page-header">
+      <h1 id="pageTitle">ประกาศทั้งหมด</h1>
+      <p class="subtitle" id="pageSubtitle">
+        ค้นหาประกาศพื้นที่กระเป๋าและบริการระหว่างไทย - อียิปต์
+      </p>
+    </header>
 
 <input
   type="text"
@@ -129,13 +155,13 @@ select.search-box {
 
 <select id="directionFilter" class="search-box">
   <option value="">ทุกเส้นทาง</option>
-  <option value="TH_TO_EG">🇹🇭 ไทย → 🇪🇬 อียิปต์</option>
-  <option value="EG_TO_TH">🇪🇬 อียิปต์ → 🇹🇭 ไทย</option>
+  <option value="TH_TO_EG">ไทย → อียิปต์</option>
+  <option value="EG_TO_TH">อียิปต์ → ไทย</option>
 </select>
 
 <select id="categoryFilter" class="search-box">
   <option value="">ทุกหมวดหมู่</option>
-  <option value="luggage">ฝากหิ้ว / พื้นที่กระเป๋า</option>
+    <option value="luggage">พื้นที่กระเป๋า</option>
   <option value="buying-service">ฝากซื้อสินค้า</option>
   <option value="marketplace">ซื้อขายสินค้า</option>
   <option value="shipping">ขนส่งพัสดุ</option>
@@ -143,6 +169,19 @@ select.search-box {
   <option value="announcements">ประกาศทั่วไป</option>
 </select>
 
+<select id="posterFilter" class="search-box">
+  <option value="">ทุกประเภทผู้โพสต์</option>
+  <option value="traveler">ผู้เดินทางเอง</option>
+  <option value="agent">ผ่านตัวแทน</option>
+  <option value="unknown">ไม่ระบุ</option>
+</select>
+
+<select id="sortFilter" class="search-box">
+  <option value="date">เรียงตาม: วันที่ใกล้ที่สุด</option>
+    <option value="price_kg">เรียงตาม: ราคาต่อกิโล (ต่ำสุด)</option>
+  <option value="price_bag">เรียงตาม: ราคาต่อใบ (ต่ำสุด)</option>
+</select>
+<p class="result-count" id="resultCount"></p>
     <div id="listingContainer">
       <div class="message">กำลังโหลดประกาศ...</div>
     </div>
@@ -152,11 +191,13 @@ select.search-box {
     const listingContainer = document.getElementById("listingContainer");
     const searchInput = document.getElementById("searchInput");
     const directionFilter = document.getElementById("directionFilter");
-    const categoryFilter = document.getElementById("categoryFilter");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const sortFilter = document.getElementById("sortFilter");
+    const posterFilter = document.getElementById("posterFilter");
     let allListings = [];
 
     const categoryNames = {
-      "luggage": "ฝากหิ้ว / พื้นที่กระเป๋า",
+      "luggage": "พื้นที่กระเป๋า",
       "buying-service": "ฝากซื้อสินค้า",
       "marketplace": "ซื้อขายสินค้า",
       "shipping": "ขนส่งพัสดุ",
@@ -183,7 +224,7 @@ select.search-box {
         document.getElementById("pageTitle").textContent =
           "ประกาศทั้งหมด";
         document.getElementById("pageSubtitle").textContent =
-          "ค้นหาประกาศฝากหิ้วและบริการระหว่างไทย - อียิปต์";
+          "ค้นหาประกาศพื้นที่กระเป๋าและบริการระหว่างไทย - อียิปต์";
       }
     }
 
@@ -202,6 +243,8 @@ async function loadListings() {
       travel_date,
       capacity_kg,
       price_per_kg,
+      price_per_bag,
+      poster_type,
       currency,
       category,
       description,
@@ -248,15 +291,44 @@ function renderListings() {
     const matchesCategory =
       !selectedCategoryValue || item.category === selectedCategoryValue;
 
-    return matchesKeyword && matchesDirection && matchesCategory;
+        const selectedPoster = posterFilter.value;
+
+    const matchesPoster =
+      !selectedPoster ||
+      (selectedPoster === "unknown"
+        ? !item.poster_type
+        : item.poster_type === selectedPoster);
+
+    return matchesKeyword && matchesDirection && matchesCategory && matchesPoster;
   });
 
+      const priceField =
+    sortFilter.value === "price_kg" ? "price_per_kg" :
+    sortFilter.value === "price_bag" ? "price_per_bag" : null;
+
+  results.sort((a, b) => {
+    if (priceField) {
+      const aMissing = a[priceField] == null;
+      const bMissing = b[priceField] == null;
+
+      if (aMissing && !bMissing) return 1;
+      if (!aMissing && bMissing) return -1;
+
+      if (!aMissing && !bMissing && a[priceField] !== b[priceField]) {
+        return a[priceField] - b[priceField];
+      }
+    }
+
+    return a.travel_date.localeCompare(b.travel_date);
+  });
+document.getElementById("resultCount").textContent =
+  "พบ " + results.length.toLocaleString("th-TH") + " รายการ";
   listingContainer.innerHTML = "";
 
   if (results.length === 0) {
     listingContainer.className = "message";
     listingContainer.textContent =
-            keyword || selectedDirection || selectedCategoryValue
+                        keyword || selectedDirection || selectedCategoryValue || posterFilter.value
         ? "ไม่พบประกาศที่ตรงกับเงื่อนไข"
         : "ยังไม่มีประกาศในขณะนี้";
     return;
@@ -275,8 +347,8 @@ function renderListings() {
     direction.className = "detail";
     direction.textContent =
       item.direction === "TH_TO_EG"
-        ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
-        : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+        ? "ไทย → อียิปต์"
+        : "อียิปต์ → ไทย";
 
     const route = document.createElement("p");
     route.className = "detail";
@@ -303,9 +375,25 @@ function renderListings() {
 
     const price = document.createElement("p");
     price.className = "detail";
+        const priceParts = [];
+    const currencyText = item.currency || "";
+
+    if (item.price_per_kg != null) {
+      priceParts.push(
+        Number(item.price_per_kg).toLocaleString("en-US") +
+        " " + currencyText + " / กก."
+      );
+    }
+
+    if (item.price_per_bag != null) {
+      priceParts.push(
+        Number(item.price_per_bag).toLocaleString("en-US") +
+        " " + currencyText + " / ใบ"
+      );
+    }
+
     price.textContent =
-      "ราคา: " + (item.price_per_kg ?? "-") +
-      " " + (item.currency || "");
+      "ราคา: " + (priceParts.length ? priceParts.join(" หรือ ") : "-");
 
     const description = document.createElement("p");
     description.className = "detail";
@@ -360,6 +448,8 @@ function renderListings() {
 searchInput.addEventListener("input", renderListings);
 directionFilter.addEventListener("change", renderListings);
 categoryFilter.addEventListener("change", renderListings);
+sortFilter.addEventListener("change", renderListings);
+posterFilter.addEventListener("change", renderListings);
 categoryFilter.addEventListener("change", updatePageHeading);
 
 loadListings();

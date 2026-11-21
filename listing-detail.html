@@ -8,6 +8,10 @@
   <title>รายละเอียดประกาศ | Thai2Cairo</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="assets/js/supabase.js"></script>
 
   <style>
@@ -17,9 +21,9 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f5f9;
-      color: #222;
+            font-family: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
     }
 
     header {
@@ -137,6 +141,7 @@
     }
 
     .report-toggle {
+      font-family: inherit;
       display: block;
       width: 100%;
       margin-top: 15px;
@@ -202,6 +207,7 @@
     }
 
     .report-submit {
+      font-family: inherit;
       width: 100%;
       padding: 12px;
       background: #1d3557;
@@ -254,6 +260,52 @@
         font-size: 13px;
       }
     }
+
+    /* สีและหน้าตาแบบเว็บเก่า */
+    header {
+      background: linear-gradient(135deg, #173b70, #2878a8);
+    }
+
+    .back-link {
+      color: #176b9a;
+    }
+
+    h1 {
+      color: #172033;
+    }
+
+    .direction {
+      background: #eef8fc;
+      color: #17658e;
+    }
+
+    .section-title {
+      color: #172033;
+    }
+
+    .contact-button {
+      background: #172033;
+    }
+
+    .contact-button:hover {
+      background: #2a3650;
+    }
+
+    .report-toggle:hover {
+      color: #176b9a;
+      border-color: #176b9a;
+    }
+
+    .report-box select:focus,
+    .report-box textarea:focus {
+      border-color: #2878a8;
+    }
+
+    .report-submit {
+      background: #176b9a;
+    }
+  </style>
+
   </style>
 </head>
 
@@ -287,7 +339,7 @@
     document.getElementById("detailContainer");
 
   const categoryNames = {
-    "luggage": "ฝากหิ้ว / พื้นที่กระเป๋า",
+    "luggage": "พื้นที่กระเป๋า",
     "buying-service": "ฝากซื้อสินค้า",
     "marketplace": "ซื้อขายสินค้า",
     "shipping": "ขนส่งพัสดุ",
@@ -393,8 +445,8 @@ function formatDate(dateString) {
     direction.className = "direction";
     direction.textContent =
       item.direction === "TH_TO_EG"
-        ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
-        : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+        ? "ไทย → อียิปต์"
+        : "อียิปต์ → ไทย";
 
     card.append(title, direction);
 
@@ -495,7 +547,7 @@ function formatDate(dateString) {
     const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "report-toggle";
-    toggle.textContent = "🚩 รายงานประกาศนี้";
+        toggle.textContent = "🚩 รายงาน / แจ้งแก้ไขประกาศนี้";
 
     const box = document.createElement("div");
     box.className = "report-box";
@@ -508,8 +560,8 @@ function formatDate(dateString) {
         [
       { value: "scam", label: "สงสัยว่าเป็นการหลอกลวง" },
       { value: "suspicious", label: "น่าสงสัย / พฤติกรรมไม่ปกติ" },
-      { value: "incorrect_information", label: "ข้อมูลไม่ถูกต้อง" },
-      { value: "expired", label: "ประกาศหมดอายุหรือไม่ว่างแล้ว" },
+            { value: "incorrect_information", label: "ข้อมูลไม่ถูกต้อง / ราคาหรือน้ำหนักเปลี่ยน" },
+      { value: "expired", label: "เต็มแล้ว" },
       { value: "other", label: "อื่น ๆ" }
     ].forEach(function (item) {
       const option = document.createElement("option");
@@ -519,7 +571,8 @@ function formatDate(dateString) {
     });
 
     const detailsLabel = document.createElement("label");
-    detailsLabel.textContent = "รายละเอียดเพิ่มเติม (ไม่บังคับ)";
+        detailsLabel.textContent =
+      "รายละเอียดเพิ่มเติม (เจ้าของประกาศ: ระบุราคา/น้ำหนักใหม่ และช่องทางติดต่อเพื่อยืนยัน)";
 
     const detailsInput = document.createElement("textarea");
     detailsInput.maxLength = 2000;

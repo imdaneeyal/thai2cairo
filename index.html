@@ -8,6 +8,10 @@
   <title>Thai2Cairo | ตลาดประกาศไทย-อียิปต์</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="assets/js/supabase.js"></script>
 
   <style>
@@ -17,9 +21,9 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f5f9;
-      color: #222;
+            font-family: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
     }
 
     a {
@@ -151,7 +155,8 @@
       margin-top: 25px;
     }
 
-    .search-box input {
+        .search-box input {
+      font-family: inherit;
       flex: 1;
       min-width: 0;
       padding: 14px;
@@ -165,7 +170,8 @@
       border-color: #1d3557;
     }
 
-    .search-box button {
+        .search-box button {
+      font-family: inherit;
       border: none;
       border-radius: 8px;
       padding: 0 20px;
@@ -304,7 +310,57 @@
         font-size: 18px;
       }
     }
+
+
+    /* สีและหน้าตาแบบเว็บเก่า */
+    .hero {
+      background: linear-gradient(135deg, #173b70, #2878a8);
+    }
+
+    .logo {
+      color: #173b70;
+    }
+
+    .post-button,
+    .search-box button {
+      background: #176b9a;
+    }
+
+    .route-card.active {
+      border-color: #2878a8;
+      background: #eef8fc;
+    }
+
+    .search-box input:focus {
+      border-color: #2878a8;
+    }
+
+    .section-heading a {
+      color: #176b9a;
+    }
+
+    .listing h3 {
+      color: #172033;
+    }
+
+    .listing .direction {
+      background: #eef8fc;
+      color: #17658e;
+    }
+
+    .contact {
+      background: #172033;
+    }
+
+    .contact.view-detail {
+      background: #eef1f6;
+      color: #172033;
+    }
   </style>
+
+
+
+
 </head>
 
 <body>
@@ -324,7 +380,7 @@
     <h1>Thai2Cairo</h1>
     <p>
       ตลาดประกาศสำหรับคนไทยและคนไทยในอียิปต์<br>
-      ค้นหา ฝากหิ้ว ฝากซื้อ และบริการระหว่างสองประเทศ
+            ค้นหาพื้นที่กระเป๋า ฝากซื้อ และบริการระหว่างสองประเทศ
     </p>
   </section>
 
@@ -333,12 +389,12 @@
     <section class="route-section">
       <div class="routes">
         <div class="route-card" id="thToEg">
-          <strong>🇹🇭 ไทย → 🇪🇬 อียิปต์</strong>
+          <strong>ไทย → อียิปต์</strong>
           <span>กรุงเทพฯ → ไคโร</span>
         </div>
 
         <div class="route-card" id="egToTh">
-          <strong>🇪🇬 อียิปต์ → 🇹🇭 ไทย</strong>
+          <strong>อียิปต์ → ไทย</strong>
           <span>ไคโร → กรุงเทพฯ</span>
         </div>
       </div>
@@ -349,7 +405,7 @@
         <input
           type="search"
           id="searchInput"
-          placeholder="ค้นหาประกาศ เช่น ฝากหิ้ว กรุงเทพฯ..."
+          placeholder="ค้นหาประกาศ เช่น พื้นที่กระเป๋า กรุงเทพฯ..."
         >
         <button id="searchButton">ค้นหา</button>
       </div>
@@ -360,7 +416,7 @@
         <h2 id="listingHeading">ประกาศล่าสุด</h2>
         <a href="listings.html">ดูทั้งหมด →</a>
       </div>
-
+<p id="resultCount" style="margin:0 0 12px;font-size:14px;color:#666;"></p>
       <div class="listing-grid" id="listingContainer">
         <div class="empty-message">กำลังโหลดประกาศ...</div>
       </div>
@@ -373,7 +429,7 @@
 
       <div class="listing-grid">
         <a class="listing" href="listings.html?category=luggage">
-          <h3>🧳 ฝากหิ้ว / พื้นที่กระเป๋า</h3>
+          <h3>🧳 พื้นที่กระเป๋า</h3>
           <p>ค้นหาพื้นที่กระเป๋าระหว่างไทยและอียิปต์</p>
         </a>
 
@@ -394,7 +450,7 @@
 
         <a class="listing" href="listings.html?category=services">
           <h3>🤝 บริการต่าง ๆ</h3>
-          <p>ค้นหาบริการอื่น ๆ จากสมาชิก</p>
+          <p>ค้นหาบริการอื่น ๆ จากผู้ประกาศ</p>
         </a>
 
         <a class="listing" href="listings.html?category=announcements">
@@ -479,6 +535,10 @@
         return matchesDirection && matchesKeyword;
       });
 
+document.getElementById("resultCount").textContent =
+  "พบ " + results.length.toLocaleString("th-TH") + " รายการ" +
+  (results.length > 6 ? " (แสดง 6 รายการล่าสุด)" : "");
+
       listingContainer.innerHTML = "";
 
       if (results.length === 0) {
@@ -502,8 +562,8 @@
         direction.className = "direction";
         direction.textContent =
           item.direction === "TH_TO_EG"
-            ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
-            : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+            ? "ไทย → อียิปต์"
+            : "อียิปต์ → ไทย";
 
         const route = document.createElement("p");
         route.textContent =
@@ -534,7 +594,7 @@ date.textContent = "วันเดินทาง: " + formattedDate;
           "รายละเอียด: " + (item.description || "-");
 
         const detail = document.createElement("a");
-        detail.className = "contact";
+        detail.className = "contact view-detail";
         detail.href = `listing-detail.html?id=${encodeURIComponent(item.id)}`;
         detail.textContent = "ดูรายละเอียด";
 

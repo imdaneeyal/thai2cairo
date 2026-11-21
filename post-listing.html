@@ -8,6 +8,10 @@
   <title>ลงประกาศ | Thai2Cairo</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="assets/js/supabase.js"></script>
 
   <style>
@@ -17,9 +21,9 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f5f9;
-      color: #222;
+            font-family: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
     }
 
     header {
@@ -141,7 +145,8 @@
       margin-bottom: 22px;
     }
 
-    button {
+        button {
+      font-family: inherit;
       width: 100%;
       border: none;
       background: #1d3557;
@@ -179,6 +184,32 @@
         gap: 0;
       }
     }
+
+
+    /* สีและหน้าตาแบบเว็บเก่า */
+    header {
+      background: linear-gradient(135deg, #173b70, #2878a8);
+    }
+
+    h1 {
+      color: #172033;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2878a8;
+    }
+
+    .notice {
+      background: #eef8fc;
+      border-left-color: #2878a8;
+    }
+
+    button {
+      background: #176b9a;
+    }
+
   </style>
 </head>
 
@@ -197,23 +228,23 @@
     <h1>ลงประกาศใหม่</h1>
 
     <p class="intro">
-      กรอกข้อมูลประกาศของคุณ เพื่อให้สมาชิกคนอื่นสามารถค้นหาและติดต่อได้
+            กรอกข้อมูลประกาศของคุณ เพื่อให้ผู้สนใจสามารถค้นหาและติดต่อได้
     </p>
 
     <div class="notice">
       ประกาศของคุณจะถูกส่งให้ Admin ตรวจสอบก่อนเผยแพร่
-      เมื่อได้รับการอนุมัติแล้ว สมาชิกทุกคนจึงจะมองเห็นประกาศได้
+      เมื่อได้รับการอนุมัติแล้ว ทุกคนจึงจะมองเห็นประกาศได้
     </div>
 
     <form id="listingForm">
 
       <div class="field">
-        <label>หัวข้อประกาศ <span class="required">*</span></label>
+        <label>ชื่อ / หัวข้อประกาศ <span class="required">*</span></label>
         <input
           type="text"
           id="title"
           maxlength="150"
-          placeholder="เช่น รับฝากหิ้ว กรุงเทพฯ ไปไคโร"
+          placeholder="เช่น ชื่อของคุณ หรือชื่อร้าน"
           required
         >
       </div>
@@ -222,8 +253,8 @@
         <label>เส้นทาง <span class="required">*</span></label>
         <select id="direction" required>
           <option value="">เลือกเส้นทาง</option>
-          <option value="TH_TO_EG">🇹🇭 ไทย → 🇪🇬 อียิปต์</option>
-          <option value="EG_TO_TH">🇪🇬 อียิปต์ → 🇹🇭 ไทย</option>
+          <option value="TH_TO_EG">ไทย → อียิปต์</option>
+          <option value="EG_TO_TH">อียิปต์ → ไทย</option>
         </select>
       </div>
 
@@ -258,7 +289,7 @@
         <label>หมวดหมู่ <span class="required">*</span></label>
         <select id="category" required>
           <option value="">เลือกหมวดหมู่</option>
-          <option value="luggage">ฝากหิ้ว / พื้นที่กระเป๋า</option>
+          <option value="luggage">พื้นที่กระเป๋า</option>
           <option value="buying-service">ฝากซื้อสินค้า</option>
           <option value="marketplace">ซื้อขายสินค้า</option>
           <option value="shipping">ขนส่งพัสดุ</option>
@@ -280,7 +311,7 @@
         </div>
 
         <div class="field">
-          <label>ราคาต่อหน่วย</label>
+          <label>ราคาต่อกิโล</label>
           <input
             type="number"
             id="price"
@@ -291,13 +322,68 @@
         </div>
       </div>
 
+            <div class="row-fields">
+        <div class="field">
+          <label>ราคาต่อใบ</label>
+          <input
+            type="number"
+            id="priceBag"
+            min="0"
+            step="0.01"
+            placeholder="เช่น 5000"
+          >
+        </div>
+
+        <div class="field">
+          <label>สกุลเงิน</label>
+          <select id="currency">
+            <option value="THB">THB - บาทไทย</option>
+            <option value="EGP">EGP - ปอนด์อียิปต์</option>
+            <option value="USD">USD - ดอลลาร์สหรัฐ</option>
+          </select>
+        </div>
+      </div>
+
       <div class="field">
-        <label>สกุลเงิน</label>
-        <select id="currency">
-          <option value="THB">THB - บาทไทย</option>
-          <option value="EGP">EGP - ปอนด์อียิปต์</option>
-          <option value="USD">USD - ดอลลาร์สหรัฐ</option>
+        <label>ประเภทผู้โพสต์</label>
+        <select id="posterType">
+          <option value="">ไม่ระบุ</option>
+          <option value="traveler">ผู้เดินทางเอง</option>
+          <option value="agent">ผ่านตัวแทน</option>
         </select>
+      </div>
+
+                  <div class="row-fields">
+        <div class="field">
+          <label>จุดฝาก</label>
+          <select id="dropoffSelect"></select>
+          <input
+            type="text"
+            id="dropoffPoint"
+            maxlength="150"
+            placeholder="พิมพ์ชื่อสถานที่"
+            style="margin-top: 8px;"
+            hidden
+          >
+        </div>
+
+        <div class="field">
+          <label>จุดรับสินค้า</label>
+          <select id="pickupSelect"></select>
+          <input
+            type="text"
+            id="pickupPoint"
+            maxlength="150"
+            placeholder="พิมพ์ชื่อสถานที่"
+            style="margin-top: 8px;"
+            hidden
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label>วันสุดท้ายของการรับฝาก</label>
+        <input type="date" id="dropoffDeadline">
       </div>
 
       <div class="field">
@@ -369,6 +455,36 @@
 
     travelDate.min = localToday;
 
+    function formatThaiShortDate(dateString) {
+    const date = new Date(dateString + "T00:00:00");
+
+    return new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }).format(date);
+  }
+
+  function buildDescription() {
+    const dropoff = document.getElementById("dropoffPoint").value.trim();
+    const pickup = document.getElementById("pickupPoint").value.trim();
+    const deadline = document.getElementById("dropoffDeadline").value;
+    const extra = document.getElementById("description").value.trim();
+
+    const lines = [];
+
+    if (dropoff) lines.push("จุดฝาก: " + dropoff);
+    if (pickup) lines.push("จุดรับสินค้า: " + pickup);
+    if (deadline) {
+      lines.push(
+        "วันสุดท้ายของการรับฝาก: " + formatThaiShortDate(deadline)
+      );
+    }
+    if (extra) lines.push(extra);
+
+    return lines.length ? lines.join("\n") : null;
+  }
+
   const directionSelect = document.getElementById("direction");
   const originInput = document.getElementById("origin");
   const destinationInput = document.getElementById("destination");
@@ -382,6 +498,108 @@
       destinationInput.value = "Bangkok";
     }
   });
+
+    const thaiProvinces = [
+    "กรุงเทพฯ",
+    "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น",
+    "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", "ชัยภูมิ",
+    "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด",
+    "ตาก", "นครนายก", "นครปฐม", "นครพนม", "นครราชสีมา",
+    "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน",
+    "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", "ปราจีนบุรี",
+    "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง",
+    "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", "แพร่",
+    "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร",
+    "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", "ราชบุรี",
+    "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ",
+    "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", "สมุทรสงคราม",
+    "สมุทรสาคร", "สระแก้ว", "สระบุรี", "สิงห์บุรี", "สุโขทัย",
+    "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", "หนองบัวลำภู",
+    "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี",
+    "อุบลราชธานี"
+  ];
+
+  const egyptPlaces = [
+    "الدراسة", "البعوث", "مدينة نصر", "الحي العاشر", "الحي السابع",
+    "الحي الثامن", "باب الشعرية", "وسط البلد", "مصر الجديدة", "المعادي",
+    "القاهرة الجديدة", "الجيزة", "6 أكتوبر", "القليوبية", "الشرقية",
+    "الإسكندرية"
+  ];
+
+  const OTHER_VALUE = "__other__";
+
+  const dropoffSelect = document.getElementById("dropoffSelect");
+  const pickupSelect = document.getElementById("pickupSelect");
+  const dropoffInput = document.getElementById("dropoffPoint");
+  const pickupInput = document.getElementById("pickupPoint");
+
+  function fillPlaceSelect(select, input, places) {
+    select.textContent = "";
+    input.hidden = true;
+    input.value = "";
+
+    if (!places) {
+      const waiting = document.createElement("option");
+      waiting.value = "";
+      waiting.textContent = "เลือกเส้นทางก่อน";
+      select.appendChild(waiting);
+      select.disabled = true;
+      return;
+    }
+
+    select.disabled = false;
+
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = "ไม่ระบุ";
+    select.appendChild(empty);
+
+    places.forEach(function (place) {
+      const option = document.createElement("option");
+      option.value = place;
+      option.textContent = place;
+      select.appendChild(option);
+    });
+
+    const other = document.createElement("option");
+    other.value = OTHER_VALUE;
+    other.textContent = "อื่น ๆ (พิมพ์เอง)";
+    select.appendChild(other);
+  }
+
+  function updatePlaceLists() {
+    const direction = directionSelect.value;
+
+    if (direction === "TH_TO_EG") {
+      fillPlaceSelect(dropoffSelect, dropoffInput, thaiProvinces);
+      fillPlaceSelect(pickupSelect, pickupInput, egyptPlaces);
+    } else if (direction === "EG_TO_TH") {
+      fillPlaceSelect(dropoffSelect, dropoffInput, egyptPlaces);
+      fillPlaceSelect(pickupSelect, pickupInput, thaiProvinces);
+    } else {
+      fillPlaceSelect(dropoffSelect, dropoffInput, null);
+      fillPlaceSelect(pickupSelect, pickupInput, null);
+    }
+  }
+
+  function getPlaceValue(select, input) {
+    if (select.value === OTHER_VALUE) {
+      return input.value.trim() || null;
+    }
+
+    return select.value || null;
+  }
+
+  dropoffSelect.addEventListener("change", function () {
+    dropoffInput.hidden = dropoffSelect.value !== OTHER_VALUE;
+  });
+
+  pickupSelect.addEventListener("change", function () {
+    pickupInput.hidden = pickupSelect.value !== OTHER_VALUE;
+  });
+
+  directionSelect.addEventListener("change", updatePlaceLists);
+  updatePlaceLists();
 
   form.addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -407,6 +625,21 @@
     const contactMethodValue =
       document.getElementById("contactMethod").value;
 
+        const deadlineValue =
+      document.getElementById("dropoffDeadline").value;
+
+    if (
+      deadlineValue &&
+      (deadlineValue < localToday || deadlineValue > travelDate.value)
+    ) {
+      message.style.color = "#d62828";
+      message.textContent =
+        "วันสุดท้ายของการรับฝากต้องไม่ก่อนวันนี้ และไม่เกินวันเดินทาง";
+      submitButton.disabled = false;
+      submitButton.textContent = "ส่งประกาศเพื่อตรวจสอบ";
+      return;
+    }
+
     // ตรวจสอบก่อนส่ง
     if (!contactMethodValue || !contactUrl) {
       message.style.color = "#d62828";
@@ -430,10 +663,16 @@
           p_price_per_kg: priceValue === "" ? null : Number(priceValue),
           p_currency: document.getElementById("currency").value,
           p_category: document.getElementById("category").value,
-          p_description: document.getElementById("description").value.trim() || null,
+          p_description: buildDescription(),
           p_contact_method: document.getElementById("contactMethod").value || null,
           p_contact_url: contactUrl || null,
-          p_source_url: sourceUrl || null
+                    p_source_url: sourceUrl || null,
+          p_price_per_bag:
+            document.getElementById("priceBag").value === ""
+              ? null
+              : Number(document.getElementById("priceBag").value),
+          p_poster_type:
+            document.getElementById("posterType").value || null
         }
       );
 
@@ -443,7 +682,8 @@
         throw new Error("ไม่สามารถยืนยันผลการส่งประกาศได้");
       }
 
-      form.reset();
+            form.reset();
+      updatePlaceLists();
       travelDate.min = localToday;
 
       message.style.color = "#176b50";
