@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>รายละเอียดประกาศ | Thai2Cairo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #222;
+    }
+
+    header {
+      background: #1d3557;
+      color: white;
+      padding: 18px 20px;
+    }
+
+    .navbar {
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 0 15px;
+    }
+
+    .back-link {
+      display: inline-block;
+      color: #1d3557;
+      margin-bottom: 18px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .detail-card {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      color: #1d3557;
+      font-size: 25px;
+      margin: 0 0 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .direction {
+      display: inline-block;
+      background: #eaf0f7;
+      color: #1d3557;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      color: #1d3557;
+      margin: 25px 0 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 13px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    .info-label {
+      color: #777;
+    }
+
+    .info-value {
+      font-weight: bold;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .description {
+      line-height: 1.8;
+      font-size: 15px;
+      color: #555;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .contact-button {
+      display: block;
+      background: #1d3557;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 25px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .contact-button:hover {
+      background: #294b78;
+    }
+
+    .report-toggle {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      background: #ffffff;
+      color: #777777;
+      border: 1px solid #dce5f0;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .report-toggle:hover {
+      color: #1d3557;
+      border-color: #1d3557;
+    }
+
+    .report-box {
+      margin-top: 15px;
+      padding: 18px;
+      background: #f3f5f9;
+      border-radius: 8px;
+    }
+
+    .report-box label {
+      display: block;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .report-box select,
+    .report-box textarea {
+      width: 100%;
+      padding: 11px;
+      margin-bottom: 15px;
+      border: 1px solid #d8dce5;
+      border-radius: 7px;
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+    }
+
+    .report-box textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+        .report-box select:focus,
+    .report-box textarea:focus {
+      outline: none;
+      border-color: #1d3557;
+    }
+
+    .report-box select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 42px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d3557' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+
+    .report-submit {
+      width: 100%;
+      padding: 12px;
+      background: #1d3557;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .report-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .report-status {
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .message {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 10px;
+      text-align: center;
+      color: #777;
+      line-height: 1.7;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .detail-card {
+        padding: 20px 16px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      .info-row {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="logo">Thai2Cairo</div>
+    <a href="index.html">หน้าหลัก</a>
+  </div>
+</header>
+
+<main class="container">
+
+  <a href="listings.html" class="back-link">
+    ← กลับไปหน้าประกาศทั้งหมด
+  </a>
+
+  <div id="detailContainer">
+    <div class="message">กำลังโหลดรายละเอียดประกาศ...</div>
+  </div>
+
+</main>
+
+<footer>
+  Thai2Cairo Marketplace
+</footer>
+
+<script>
+  const detailContainer =
+    document.getElementById("detailContainer");
+
+  const categoryNames = {
+    "luggage": "ฝากหิ้ว / พื้นที่กระเป๋า",
+    "buying-service": "ฝากซื้อสินค้า",
+    "marketplace": "ซื้อขายสินค้า",
+    "shipping": "ขนส่งพัสดุ",
+    "services": "บริการต่าง ๆ",
+    "announcements": "ประกาศทั่วไป"
+  };
+
+  function addInfoRow(parent, label, value) {
+    const row = document.createElement("div");
+    row.className = "info-row";
+
+    const labelElement = document.createElement("span");
+    labelElement.className = "info-label";
+    labelElement.textContent = label;
+
+    const valueElement = document.createElement("span");
+    valueElement.className = "info-value";
+    valueElement.textContent = value || "-";
+
+    row.append(labelElement, valueElement);
+    parent.appendChild(row);
+  }
+
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+
+  return new Date(dateString + "T00:00:00").toLocaleDateString(
+    "th-TH",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  );
+}
+
+
+  async function loadDetail() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) {
+      showMessage("ไม่พบรหัสประกาศที่ต้องการ");
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("listings")
+      .select(`
+        id,
+        title,
+        direction,
+        origin,
+        destination,
+        travel_date,
+        capacity_kg,
+        price_per_kg,
+        currency,
+        category,
+        description,
+        contact_method,
+        contact_url
+      `)
+      .eq("id", id)
+      .eq("status", "approved")
+      .gte("travel_date", new Date().toISOString().slice(0, 10))
+      .maybeSingle();
+
+    if (error) {
+      showMessage("โหลดข้อมูลไม่สำเร็จ: " + error.message);
+      return;
+    }
+
+    if (!data) {
+      showMessage("ไม่พบประกาศ หรือประกาศนี้ยังไม่ได้รับการอนุมัติ");
+      return;
+    }
+
+    renderDetail(data);
+  }
+
+  function showMessage(text) {
+    detailContainer.innerHTML = "";
+
+    const message = document.createElement("div");
+    message.className = "message";
+    message.textContent = text;
+
+    detailContainer.appendChild(message);
+  }
+
+  function renderDetail(item) {
+    detailContainer.innerHTML = "";
+
+    const card = document.createElement("article");
+    card.className = "detail-card";
+
+    const title = document.createElement("h1");
+    title.textContent = item.title || "ไม่มีหัวข้อ";
+
+    const direction = document.createElement("span");
+    direction.className = "direction";
+    direction.textContent =
+      item.direction === "TH_TO_EG"
+        ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
+        : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+
+    card.append(title, direction);
+
+    const sectionTitle = document.createElement("h2");
+    sectionTitle.className = "section-title";
+    sectionTitle.textContent = "ข้อมูลประกาศ";
+
+    card.appendChild(sectionTitle);
+
+    addInfoRow(
+      card,
+      "หมวดหมู่",
+      categoryNames[item.category] || item.category
+    );
+
+    addInfoRow(
+      card,
+      "ต้นทาง",
+      item.origin
+    );
+
+    addInfoRow(
+      card,
+      "ปลายทาง",
+      item.destination
+    );
+
+    addInfoRow(
+    card,
+    "วันเดินทาง",
+    formatDate(item.travel_date)
+    );
+
+    addInfoRow(
+      card,
+      "พื้นที่ / จำนวน",
+      item.capacity_kg == null ? "-" : item.capacity_kg + " กก."
+    );
+
+    addInfoRow(
+      card,
+      "ราคา",
+      item.price_per_kg == null
+        ? "-"
+        : item.price_per_kg + " " + (item.currency || "")
+    );
+
+    if (item.description) {
+      const descriptionTitle = document.createElement("h2");
+      descriptionTitle.className = "section-title";
+      descriptionTitle.textContent = "รายละเอียดเพิ่มเติม";
+
+      const description = document.createElement("p");
+      description.className = "description";
+      description.textContent = item.description;
+
+      card.append(descriptionTitle, description);
+    }
+
+    if (item.contact_method) {
+      const contactTitle = document.createElement("h2");
+      contactTitle.className = "section-title";
+      contactTitle.textContent = "ช่องทางติดต่อ";
+
+      const contactMethod = document.createElement("p");
+      contactMethod.textContent = item.contact_method;
+
+      card.append(contactTitle, contactMethod);
+    }
+
+    if (item.contact_url) {
+      try {
+        const url = new URL(item.contact_url);
+
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          const contactButton = document.createElement("a");
+          contactButton.className = "contact-button";
+          contactButton.href = url.href;
+          contactButton.target = "_blank";
+          contactButton.rel = "noopener noreferrer";
+          contactButton.textContent = "ติดต่อผู้ประกาศ";
+
+          card.appendChild(contactButton);
+        }
+      } catch (e) {
+        // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
+      }
+    }
+
+        card.appendChild(createReportSection(item.id));
+
+    detailContainer.appendChild(card);
+  }
+
+  function createReportSection(listingId) {
+    const wrapper = document.createElement("div");
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "report-toggle";
+    toggle.textContent = "🚩 รายงานประกาศนี้";
+
+    const box = document.createElement("div");
+    box.className = "report-box";
+    box.hidden = true;
+
+    const reasonLabel = document.createElement("label");
+    reasonLabel.textContent = "เหตุผลที่รายงาน";
+
+    const reasonSelect = document.createElement("select");
+        [
+      { value: "scam", label: "สงสัยว่าเป็นการหลอกลวง" },
+      { value: "suspicious", label: "น่าสงสัย / พฤติกรรมไม่ปกติ" },
+      { value: "incorrect_information", label: "ข้อมูลไม่ถูกต้อง" },
+      { value: "expired", label: "ประกาศหมดอายุหรือไม่ว่างแล้ว" },
+      { value: "other", label: "อื่น ๆ" }
+    ].forEach(function (item) {
+      const option = document.createElement("option");
+      option.value = item.value;
+      option.textContent = item.label;
+      reasonSelect.appendChild(option);
+    });
+
+    const detailsLabel = document.createElement("label");
+    detailsLabel.textContent = "รายละเอียดเพิ่มเติม (ไม่บังคับ)";
+
+    const detailsInput = document.createElement("textarea");
+    detailsInput.maxLength = 2000;
+
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.className = "report-submit";
+    submit.textContent = "ส่งรายงาน";
+
+    const status = document.createElement("div");
+    status.className = "report-status";
+    status.setAttribute("role", "status");
+
+    box.append(
+      reasonLabel,
+      reasonSelect,
+      detailsLabel,
+      detailsInput,
+      submit,
+      status
+    );
+
+    toggle.addEventListener("click", function () {
+      box.hidden = !box.hidden;
+    });
+
+        submit.addEventListener("click", async function () {
+      status.style.color = "#777";
+      status.textContent = "";
+
+      submit.disabled = true;
+      submit.textContent = "กำลังส่งรายงาน...";
+
+      try {
+        const { data: sessionData } =
+          await supabaseClient.auth.getSession();
+
+        const userId =
+          sessionData && sessionData.session
+            ? sessionData.session.user.id
+            : null;
+
+        const { error } = await supabaseClient
+          .from("reports")
+          .insert({
+            listing_id: listingId,
+            reporter_id: userId,
+            reason: reasonSelect.value,
+            details: detailsInput.value.trim() || null
+          });
+
+        if (error) throw error;
+
+        detailsInput.value = "";
+        status.style.color = "#176b50";
+        status.textContent =
+          "ส่งรายงานเรียบร้อยแล้ว ขอบคุณที่ช่วยแจ้งให้เราทราบ";
+        submit.hidden = true;
+
+      } catch (error) {
+        console.error("report error:", error);
+        status.style.color = "#d62828";
+        status.textContent =
+          "ส่งรายงานไม่สำเร็จ กรุณาลองใหม่ในภายหลัง";
+        submit.disabled = false;
+        submit.textContent = "ส่งรายงาน";
+      }
+    });
+
+    wrapper.append(toggle, box);
+    return wrapper;
+  }
+
+  loadDetail();
+</script>
+
+</body>
+</html>

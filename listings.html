@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประกาศทั้งหมด | Thai2Cairo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      color: #1d3557;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+.search-box {
+  width: 100%;
+  padding: 13px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #dce5f0;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  background: #ffffff;
+}
+
+.search-box:focus {
+  border-color: #1d3557;
+}
+
+select.search-box {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d3557' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+    .listing {
+      background: #ffffff;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .listing h3 {
+      margin-top: 0;
+      color: #1d3557;
+    }
+
+    .detail {
+      margin: 9px 0;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .contact,
+    .view-detail {
+      display: inline-block;
+      padding: 10px 16px;
+      background: #1d3557;
+      color: white;
+      text-decoration: none;
+      border-radius: 7px;
+    }
+
+    .view-detail {
+      background: #eaf0f7;
+      color: #1d3557;
+      border: 1px solid #dce5f0;
+    }
+
+    .message {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      background: white;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1 id="pageTitle">ประกาศทั้งหมด</h1>
+<p class="subtitle" id="pageSubtitle">
+  ค้นหาประกาศฝากหิ้วและบริการระหว่างไทย - อียิปต์
+</p>
+
+<input
+  type="text"
+  id="searchInput"
+  class="search-box"
+  placeholder="ค้นหาชื่อประกาศ ต้นทาง ปลายทาง หรือรายละเอียด..."
+>
+
+<select id="directionFilter" class="search-box">
+  <option value="">ทุกเส้นทาง</option>
+  <option value="TH_TO_EG">🇹🇭 ไทย → 🇪🇬 อียิปต์</option>
+  <option value="EG_TO_TH">🇪🇬 อียิปต์ → 🇹🇭 ไทย</option>
+</select>
+
+<select id="categoryFilter" class="search-box">
+  <option value="">ทุกหมวดหมู่</option>
+  <option value="luggage">ฝากหิ้ว / พื้นที่กระเป๋า</option>
+  <option value="buying-service">ฝากซื้อสินค้า</option>
+  <option value="marketplace">ซื้อขายสินค้า</option>
+  <option value="shipping">ขนส่งพัสดุ</option>
+  <option value="services">บริการต่าง ๆ</option>
+  <option value="announcements">ประกาศทั่วไป</option>
+</select>
+
+    <div id="listingContainer">
+      <div class="message">กำลังโหลดประกาศ...</div>
+    </div>
+  </main>
+
+  <script>
+    const listingContainer = document.getElementById("listingContainer");
+    const searchInput = document.getElementById("searchInput");
+    const directionFilter = document.getElementById("directionFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+    let allListings = [];
+
+    const categoryNames = {
+      "luggage": "ฝากหิ้ว / พื้นที่กระเป๋า",
+      "buying-service": "ฝากซื้อสินค้า",
+      "marketplace": "ซื้อขายสินค้า",
+      "shipping": "ขนส่งพัสดุ",
+      "services": "บริการต่าง ๆ",
+      "announcements": "ประกาศทั่วไป"
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const selectedCategory = params.get("category");
+
+        if (selectedCategory && categoryNames[selectedCategory]) {
+      categoryFilter.value = selectedCategory;
+    }
+
+    function updatePageHeading() {
+      const value = categoryFilter.value;
+
+      if (value && categoryNames[value]) {
+        document.getElementById("pageTitle").textContent =
+          categoryNames[value];
+        document.getElementById("pageSubtitle").textContent =
+          "ประกาศในหมวดหมู่ " + categoryNames[value];
+      } else {
+        document.getElementById("pageTitle").textContent =
+          "ประกาศทั้งหมด";
+        document.getElementById("pageSubtitle").textContent =
+          "ค้นหาประกาศฝากหิ้วและบริการระหว่างไทย - อียิปต์";
+      }
+    }
+
+    updatePageHeading();
+
+
+async function loadListings() {
+  let query = supabaseClient
+    .from("listings")
+    .select(`
+      id,
+      title,
+      direction,
+      origin,
+      destination,
+      travel_date,
+      capacity_kg,
+      price_per_kg,
+      currency,
+      category,
+      description,
+      contact_method,
+      contact_url
+    `)
+    .eq("status", "approved")
+    .gte("travel_date", new Date().toISOString().slice(0, 10));
+
+  const { data, error } = await query
+    .order("travel_date", { ascending: true });
+
+  if (error) {
+    listingContainer.textContent =
+      "โหลดประกาศไม่สำเร็จ: " + error.message;
+    listingContainer.className = "message";
+    return;
+  }
+
+  allListings = data || [];
+  renderListings();
+}
+
+
+function renderListings() {
+  const keyword = searchInput.value.trim().toLowerCase();
+    const selectedDirection = directionFilter.value;
+  const selectedCategoryValue = categoryFilter.value;
+
+  const results = allListings.filter(item => {
+    const searchableText = [
+      item.title,
+      item.origin,
+      item.destination,
+      item.description
+    ].join(" ").toLowerCase();
+
+    const matchesKeyword =
+      !keyword || searchableText.includes(keyword);
+
+        const matchesDirection =
+      !selectedDirection || item.direction === selectedDirection;
+
+    const matchesCategory =
+      !selectedCategoryValue || item.category === selectedCategoryValue;
+
+    return matchesKeyword && matchesDirection && matchesCategory;
+  });
+
+  listingContainer.innerHTML = "";
+
+  if (results.length === 0) {
+    listingContainer.className = "message";
+    listingContainer.textContent =
+            keyword || selectedDirection || selectedCategoryValue
+        ? "ไม่พบประกาศที่ตรงกับเงื่อนไข"
+        : "ยังไม่มีประกาศในขณะนี้";
+    return;
+  }
+
+  listingContainer.className = "";
+
+  results.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "listing";
+
+    const title = document.createElement("h3");
+    title.textContent = item.title || "ไม่มีหัวข้อ";
+
+    const direction = document.createElement("p");
+    direction.className = "detail";
+    direction.textContent =
+      item.direction === "TH_TO_EG"
+        ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
+        : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+
+    const route = document.createElement("p");
+    route.className = "detail";
+    route.textContent =
+      `เส้นทาง: ${item.origin || "-"} → ${item.destination || "-"}`;
+
+    const date = document.createElement("p");
+    date.className = "detail";
+
+    const travelDate = new Date(item.travel_date + "T00:00:00");
+
+    const formattedDate = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(travelDate);
+
+    date.textContent = "วันเดินทาง: " + formattedDate;
+
+    const capacity = document.createElement("p");
+    capacity.className = "detail";
+    capacity.textContent =
+      "พื้นที่: " + (item.capacity_kg ?? "-") + " กก.";
+
+    const price = document.createElement("p");
+    price.className = "detail";
+    price.textContent =
+      "ราคา: " + (item.price_per_kg ?? "-") +
+      " " + (item.currency || "");
+
+    const description = document.createElement("p");
+    description.className = "detail";
+    description.textContent =
+      "รายละเอียด: " + (item.description || "-");
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const viewDetail = document.createElement("a");
+    viewDetail.className = "view-detail";
+    viewDetail.href =
+      "listing-detail.html?id=" + encodeURIComponent(item.id);
+    viewDetail.textContent = "ดูรายละเอียด";
+
+    actions.appendChild(viewDetail);
+
+    if (item.contact_url) {
+      try {
+        const url = new URL(item.contact_url);
+
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          const contact = document.createElement("a");
+          contact.className = "contact";
+          contact.href = url.href;
+          contact.target = "_blank";
+          contact.rel = "noopener noreferrer";
+          contact.textContent = "ติดต่อผู้ประกาศ";
+          actions.appendChild(contact);
+        }
+      } catch (e) {
+        // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
+      }
+    }
+
+    card.append(
+      title,
+      direction,
+      route,
+      date,
+      capacity,
+      price,
+      description,
+      actions
+    );
+
+    listingContainer.appendChild(card);
+  });
+}
+
+
+searchInput.addEventListener("input", renderListings);
+directionFilter.addEventListener("change", renderListings);
+categoryFilter.addEventListener("change", renderListings);
+categoryFilter.addEventListener("change", updatePageHeading);
+
+loadListings();
+
+  </script>
+</body>
+</html>

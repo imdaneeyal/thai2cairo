@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ลงประกาศ | Thai2Cairo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #222;
+    }
+
+    header {
+      background: #1d3557;
+      color: white;
+      padding: 18px 20px;
+    }
+
+    .navbar {
+      max-width: 850px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: 35px auto;
+      padding: 0 15px;
+    }
+
+    .form-card {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      color: #1d3557;
+      font-size: 25px;
+      margin-top: 0;
+    }
+
+    .intro {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .required {
+      color: #d62828;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d8dce5;
+      border-radius: 7px;
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+    }
+
+        input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #1d3557;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 42px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231d3557' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .row-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .hint {
+      color: #888;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .notice {
+      background: #eef2f8;
+      border-left: 4px solid #1d3557;
+      padding: 14px;
+      border-radius: 5px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      background: #1d3557;
+      color: white;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px auto;
+      }
+
+      .form-card {
+        padding: 20px 16px;
+      }
+
+      .row-fields {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="logo">Thai2Cairo</div>
+    <a href="index.html">← กลับหน้าหลัก</a>
+  </div>
+</header>
+
+<main class="container">
+  <div class="form-card">
+
+    <h1>ลงประกาศใหม่</h1>
+
+    <p class="intro">
+      กรอกข้อมูลประกาศของคุณ เพื่อให้สมาชิกคนอื่นสามารถค้นหาและติดต่อได้
+    </p>
+
+    <div class="notice">
+      ประกาศของคุณจะถูกส่งให้ Admin ตรวจสอบก่อนเผยแพร่
+      เมื่อได้รับการอนุมัติแล้ว สมาชิกทุกคนจึงจะมองเห็นประกาศได้
+    </div>
+
+    <form id="listingForm">
+
+      <div class="field">
+        <label>หัวข้อประกาศ <span class="required">*</span></label>
+        <input
+          type="text"
+          id="title"
+          maxlength="150"
+          placeholder="เช่น รับฝากหิ้ว กรุงเทพฯ ไปไคโร"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label>เส้นทาง <span class="required">*</span></label>
+        <select id="direction" required>
+          <option value="">เลือกเส้นทาง</option>
+          <option value="TH_TO_EG">🇹🇭 ไทย → 🇪🇬 อียิปต์</option>
+          <option value="EG_TO_TH">🇪🇬 อียิปต์ → 🇹🇭 ไทย</option>
+        </select>
+      </div>
+
+      <div class="row-fields">
+        <div class="field">
+          <label>ต้นทาง <span class="required">*</span></label>
+          <input
+            type="text"
+            id="origin"
+            placeholder="เช่น Bangkok"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>ปลายทาง <span class="required">*</span></label>
+          <input
+            type="text"
+            id="destination"
+            placeholder="เช่น Cairo"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label>วันเดินทาง <span class="required">*</span></label>
+        <input type="date" id="travelDate" required>
+      </div>
+
+      <div class="field">
+        <label>หมวดหมู่ <span class="required">*</span></label>
+        <select id="category" required>
+          <option value="">เลือกหมวดหมู่</option>
+          <option value="luggage">ฝากหิ้ว / พื้นที่กระเป๋า</option>
+          <option value="buying-service">ฝากซื้อสินค้า</option>
+          <option value="marketplace">ซื้อขายสินค้า</option>
+          <option value="shipping">ขนส่งพัสดุ</option>
+          <option value="services">บริการต่าง ๆ</option>
+          <option value="announcements">ประกาศทั่วไป</option>
+        </select>
+      </div>
+
+      <div class="row-fields">
+        <div class="field">
+          <label>พื้นที่ / จำนวน (กก.)</label>
+          <input
+            type="number"
+            id="capacity"
+            min="0.01"
+            step="0.01"
+            placeholder="เช่น 10"
+          >
+        </div>
+
+        <div class="field">
+          <label>ราคาต่อหน่วย</label>
+          <input
+            type="number"
+            id="price"
+            min="0"
+            step="0.01"
+            placeholder="เช่น 300"
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label>สกุลเงิน</label>
+        <select id="currency">
+          <option value="THB">THB - บาทไทย</option>
+          <option value="EGP">EGP - ปอนด์อียิปต์</option>
+          <option value="USD">USD - ดอลลาร์สหรัฐ</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>รายละเอียดเพิ่มเติม</label>
+        <textarea
+          id="description"
+          maxlength="3000"
+          placeholder="รายละเอียดสินค้า บริการ หรือเงื่อนไขต่าง ๆ"
+        ></textarea>
+      </div>
+
+      <div class="field">
+        <label>ช่องทางติดต่อ</label>
+        <select id="contactMethod">
+          <option value="">เลือกช่องทางติดต่อ</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Messenger">Messenger</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="LINE">LINE</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>ลิงก์สำหรับติดต่อ</label>
+        <input
+          type="url"
+          id="contactUrl"
+          placeholder="https://..."
+        >
+        <div class="hint">
+          เช่น ลิงก์ Facebook, Messenger หรือ WhatsApp
+        </div>
+      </div>
+
+      <div class="field">
+        <label>ลิงก์โพสต์ต้นฉบับ (ไม่บังคับ)</label>
+        <input
+          type="url"
+          id="sourceUrl"
+          placeholder="https://www.facebook.com/..."
+        >
+        <div class="hint">
+          ใช้สำหรับให้ Admin ตรวจสอบที่มาของประกาศ ไม่แสดงต่อสาธารณะ
+        </div>
+      </div>
+
+      <button type="submit" id="submitButton">
+        ส่งประกาศเพื่อตรวจสอบ
+      </button>
+
+      <div id="message" role="status"></div>
+
+    </form>
+  </div>
+</main>
+
+<script>
+  const form = document.getElementById("listingForm");
+  const submitButton = document.getElementById("submitButton");
+  const message = document.getElementById("message");
+  const travelDate = document.getElementById("travelDate");
+
+  const today = new Date();
+  const localToday = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0")
+  ].join("-");
+
+    travelDate.min = localToday;
+
+  const directionSelect = document.getElementById("direction");
+  const originInput = document.getElementById("origin");
+  const destinationInput = document.getElementById("destination");
+
+  directionSelect.addEventListener("change", function() {
+    if (directionSelect.value === "TH_TO_EG") {
+      originInput.value = "Bangkok";
+      destinationInput.value = "Cairo";
+    } else if (directionSelect.value === "EG_TO_TH") {
+      originInput.value = "Cairo";
+      destinationInput.value = "Bangkok";
+    }
+  });
+
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    message.textContent = "";
+    message.style.color = "#d62828";
+
+    submitButton.disabled = true;
+    submitButton.textContent = "กำลังส่งประกาศ...";
+
+    const capacityValue =
+      document.getElementById("capacity").value;
+
+    const priceValue =
+      document.getElementById("price").value;
+
+    const contactUrl =
+      document.getElementById("contactUrl").value.trim();
+
+        const sourceUrl =
+      document.getElementById("sourceUrl").value.trim();
+
+    const contactMethodValue =
+      document.getElementById("contactMethod").value;
+
+    // ตรวจสอบก่อนส่ง
+    if (!contactMethodValue || !contactUrl) {
+      message.style.color = "#d62828";
+      message.textContent =
+        "กรุณาเลือกช่องทางติดต่อและใส่ลิงก์สำหรับติดต่อ เพื่อให้ผู้สนใจติดต่อคุณได้";
+      submitButton.disabled = false;
+      submitButton.textContent = "ส่งประกาศเพื่อตรวจสอบ";
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.rpc(
+        "submit_listing",
+        {
+          p_title: document.getElementById("title").value.trim(),
+          p_direction: document.getElementById("direction").value,
+          p_origin: document.getElementById("origin").value.trim(),
+          p_destination: document.getElementById("destination").value.trim(),
+          p_travel_date: travelDate.value,
+          p_capacity_kg: capacityValue === "" ? null : Number(capacityValue),
+          p_price_per_kg: priceValue === "" ? null : Number(priceValue),
+          p_currency: document.getElementById("currency").value,
+          p_category: document.getElementById("category").value,
+          p_description: document.getElementById("description").value.trim() || null,
+          p_contact_method: document.getElementById("contactMethod").value || null,
+          p_contact_url: contactUrl || null,
+          p_source_url: sourceUrl || null
+        }
+      );
+
+      if (error) throw error;
+
+      if (!data || data.success !== true || data.status !== "pending") {
+        throw new Error("ไม่สามารถยืนยันผลการส่งประกาศได้");
+      }
+
+      form.reset();
+      travelDate.min = localToday;
+
+      message.style.color = "#176b50";
+      message.textContent =
+        "ส่งประกาศเรียบร้อยแล้ว! ประกาศของคุณกำลังรอ Admin ตรวจสอบ";
+
+        } catch (error) {
+      console.error("submit_listing error:", error);
+
+      message.style.color = "#d62828";
+      message.textContent =
+        "ส่งประกาศไม่สำเร็จ กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง " +
+        "หรือลองใหม่ในภายหลัง";
+
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "ส่งประกาศเพื่อตรวจสอบ";
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Thai2Cairo | ตลาดประกาศไทย-อียิปต์</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #222;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+
+    .navbar {
+      min-height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: bold;
+      color: #1d3557;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    .post-button {
+      background: #1d3557;
+      color: white;
+      padding: 11px 17px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .hero {
+      background: #1d3557;
+      color: white;
+      padding: 55px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      margin: 0 0 12px;
+    }
+
+    .hero p {
+      color: #dce5f0;
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .route-section {
+      margin-top: -25px;
+      position: relative;
+    }
+
+    .routes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .route-card {
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 22px 15px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+
+    .route-card.active {
+      border: 2px solid #1d3557;
+      background: #eef2f8;
+    }
+
+    .route-card strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 7px;
+    }
+
+    .route-card span {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .section {
+      padding: 35px 0;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .section-heading h2 {
+      font-size: 21px;
+      margin: 0;
+    }
+
+    .section-heading a {
+      color: #1d3557;
+      font-size: 14px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .search-box input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: #1d3557;
+    }
+
+    .search-box button {
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      background: #1d3557;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .listing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .listing {
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .listing h3 {
+      margin: 0 0 12px;
+      color: #1d3557;
+      font-size: 18px;
+    }
+
+    .listing p {
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+      overflow-wrap: anywhere;
+    }
+
+    .listing .direction {
+      display: inline-block;
+      background: #eaf0f7;
+      color: #1d3557;
+      padding: 5px 9px;
+      border-radius: 5px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+        .contact {
+  display: inline-block;
+  margin-top: 12px;
+  margin-right: 10px;
+  margin-bottom: 4px;
+  padding: 10px 15px;
+  background: #1d3557;
+  color: white;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+    .empty-message {
+      background: white;
+      border-radius: 10px;
+      padding: 30px 15px;
+      text-align: center;
+      color: #777;
+      grid-column: 1 / -1;
+    }
+
+    footer {
+      background: #222;
+      color: #ccc;
+      padding: 25px 20px;
+      text-align: center;
+      font-size: 13px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 0 15px;
+      }
+
+      .navbar {
+        min-height: 62px;
+      }
+
+      .logo {
+        font-size: 18px;
+      }
+
+            .nav-links {
+        gap: 8px;
+        font-size: 13px;
+      }
+
+      .nav-links a {
+        padding: 10px 6px;
+      }
+
+      .nav-links .post-button {
+        padding: 10px 12px;
+      }
+
+      .post-button {
+        padding: 9px 11px;
+      }
+
+      .hero {
+        padding: 45px 15px;
+      }
+
+      .hero h1 {
+        font-size: 25px;
+      }
+
+      .routes {
+        gap: 10px;
+      }
+
+      .route-card {
+        padding: 17px 8px;
+      }
+
+      .route-card strong {
+        font-size: 14px;
+      }
+
+      .route-card span {
+        font-size: 11px;
+      }
+
+      .listing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo">Thai2Cairo</a>
+
+      <nav class="nav-links">
+        <a href="listings.html">ประกาศทั้งหมด</a>
+        <a href="post-listing.html" class="post-button">+ ลงประกาศ</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Thai2Cairo</h1>
+    <p>
+      ตลาดประกาศสำหรับคนไทยและคนไทยในอียิปต์<br>
+      ค้นหา ฝากหิ้ว ฝากซื้อ และบริการระหว่างสองประเทศ
+    </p>
+  </section>
+
+  <main class="container">
+
+    <section class="route-section">
+      <div class="routes">
+        <div class="route-card" id="thToEg">
+          <strong>🇹🇭 ไทย → 🇪🇬 อียิปต์</strong>
+          <span>กรุงเทพฯ → ไคโร</span>
+        </div>
+
+        <div class="route-card" id="egToTh">
+          <strong>🇪🇬 อียิปต์ → 🇹🇭 ไทย</strong>
+          <span>ไคโร → กรุงเทพฯ</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="search-box">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="ค้นหาประกาศ เช่น ฝากหิ้ว กรุงเทพฯ..."
+        >
+        <button id="searchButton">ค้นหา</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <h2 id="listingHeading">ประกาศล่าสุด</h2>
+        <a href="listings.html">ดูทั้งหมด →</a>
+      </div>
+
+      <div class="listing-grid" id="listingContainer">
+        <div class="empty-message">กำลังโหลดประกาศ...</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <h2>บริการของเรา</h2>
+      </div>
+
+      <div class="listing-grid">
+        <a class="listing" href="listings.html?category=luggage">
+          <h3>🧳 ฝากหิ้ว / พื้นที่กระเป๋า</h3>
+          <p>ค้นหาพื้นที่กระเป๋าระหว่างไทยและอียิปต์</p>
+        </a>
+
+        <a class="listing" href="listings.html?category=buying-service">
+          <h3>🛍️ ฝากซื้อสินค้า</h3>
+          <p>ค้นหาบริการรับฝากซื้อสินค้าจากอีกประเทศ</p>
+        </a>
+
+        <a class="listing" href="listings.html?category=marketplace">
+          <h3>🛒 ซื้อขายสินค้า</h3>
+          <p>ประกาศซื้อขายสินค้าระหว่างชุมชน</p>
+        </a>
+
+        <a class="listing" href="listings.html?category=shipping">
+          <h3>📦 ขนส่งพัสดุ</h3>
+          <p>ค้นหาบริการขนส่งพัสดุ</p>
+        </a>
+
+        <a class="listing" href="listings.html?category=services">
+          <h3>🤝 บริการต่าง ๆ</h3>
+          <p>ค้นหาบริการอื่น ๆ จากสมาชิก</p>
+        </a>
+
+        <a class="listing" href="listings.html?category=announcements">
+          <h3>📢 ประกาศทั่วไป</h3>
+          <p>ติดตามข่าวสารและประกาศจากชุมชน</p>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Thai2Cairo Marketplace<br>
+    ตลาดประกาศระหว่างประเทศไทยและประเทศอียิปต์
+  </footer>
+
+  <script>
+    const listingContainer =
+      document.getElementById("listingContainer");
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const listingHeading =
+      document.getElementById("listingHeading");
+
+    let allListings = [];
+    let selectedDirection = "";
+
+    async function loadListings() {
+      const { data, error } = await supabaseClient
+        .from("listings")
+        .select(`
+          id,
+          title,
+          direction,
+          origin,
+          destination,
+          travel_date,
+          capacity_kg,
+          price_per_kg,
+          currency,
+          description,
+          contact_url
+        `)
+        .eq("status", "approved")
+        .gte("travel_date", new Date().toISOString().slice(0, 10))
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        listingContainer.innerHTML = "";
+        const message = document.createElement("div");
+        message.className = "empty-message";
+        message.textContent =
+          "โหลดประกาศไม่สำเร็จ: " + error.message;
+        listingContainer.appendChild(message);
+        return;
+      }
+
+      allListings = data || [];
+      renderListings();
+    }
+
+    function renderListings() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      let results = allListings.filter(item => {
+        const matchesDirection =
+          !selectedDirection ||
+          item.direction === selectedDirection;
+
+        const searchableText = [
+          item.title,
+          item.origin,
+          item.destination,
+          item.description
+        ].join(" ").toLowerCase();
+
+        const matchesKeyword =
+          !keyword || searchableText.includes(keyword);
+
+        return matchesDirection && matchesKeyword;
+      });
+
+      listingContainer.innerHTML = "";
+
+      if (results.length === 0) {
+  const message = document.createElement("div");
+  message.className = "empty-message";
+  message.textContent = keyword
+    ? "ไม่พบประกาศที่ตรงกับการค้นหา"
+    : "ยังไม่มีประกาศในขณะนี้";
+  listingContainer.appendChild(message);
+  return;
+}
+
+      results.slice(0, 6).forEach(item => {
+        const card = document.createElement("article");
+        card.className = "listing";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title || "ไม่มีหัวข้อ";
+
+        const direction = document.createElement("span");
+        direction.className = "direction";
+        direction.textContent =
+          item.direction === "TH_TO_EG"
+            ? "🇹🇭 ไทย → 🇪🇬 อียิปต์"
+            : "🇪🇬 อียิปต์ → 🇹🇭 ไทย";
+
+        const route = document.createElement("p");
+        route.textContent =
+          `เส้นทาง: ${item.origin || "-"} → ${item.destination || "-"}`;
+
+        const date = document.createElement("p");
+        const travelDate = new Date(item.travel_date + "T00:00:00");
+
+const formattedDate = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}).format(travelDate);
+
+date.textContent = "วันเดินทาง: " + formattedDate;
+
+        const capacity = document.createElement("p");
+        capacity.textContent =
+          "พื้นที่: " + (item.capacity_kg ?? "-") + " กก.";
+
+        const price = document.createElement("p");
+        price.textContent =
+          "ราคา: " + (item.price_per_kg ?? "-") +
+          " " + (item.currency || "");
+
+        const description = document.createElement("p");
+        description.textContent =
+          "รายละเอียด: " + (item.description || "-");
+
+        const detail = document.createElement("a");
+        detail.className = "contact";
+        detail.href = `listing-detail.html?id=${encodeURIComponent(item.id)}`;
+        detail.textContent = "ดูรายละเอียด";
+
+        card.append(
+          title,
+          direction,
+          route,
+          date,
+          capacity,
+          price,
+          description,
+          detail
+        );
+
+        if (item.contact_url) {
+          try {
+            const url = new URL(item.contact_url);
+
+            if (url.protocol === "https:" || url.protocol === "http:") {
+              const contact = document.createElement("a");
+              contact.className = "contact";
+              contact.href = url.href;
+              contact.target = "_blank";
+              contact.rel = "noopener noreferrer";
+              contact.textContent = "ติดต่อผู้ประกาศ";
+              card.appendChild(contact);
+            }
+          } catch (e) {
+            // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
+          }
+        }
+
+        listingContainer.appendChild(card);
+      });
+    }
+
+    function setDirection(direction) {
+      selectedDirection = direction;
+
+      document.getElementById("thToEg")
+        .classList.toggle("active", direction === "TH_TO_EG");
+
+      document.getElementById("egToTh")
+        .classList.toggle("active", direction === "EG_TO_TH");
+
+      listingHeading.textContent =
+        direction === "TH_TO_EG"
+          ? "ประกาศไทย → อียิปต์"
+          : direction === "EG_TO_TH"
+            ? "ประกาศอียิปต์ → ไทย"
+            : "ประกาศล่าสุด";
+
+      renderListings();
+    }
+
+    document.getElementById("thToEg")
+      .addEventListener("click", () => setDirection("TH_TO_EG"));
+
+    document.getElementById("egToTh")
+      .addEventListener("click", () => setDirection("EG_TO_TH"));
+
+    document.getElementById("searchButton")
+      .addEventListener("click", renderListings);
+
+    searchInput.addEventListener("input", renderListings);
+
+    loadListings();
+  </script>
+
+</body>
+</html>

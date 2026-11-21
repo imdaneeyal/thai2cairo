@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Thai2Cairo</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #263445;
+    }
+
+    header {
+      background: #1d3557;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h2 { margin: 0; font-size: 20px; }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .logout {
+      background: white;
+      color: #1d3557;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card, .panel {
+      background: white;
+      padding: 22px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+
+    .stat-card p { color: #777; margin: 0 0 10px; }
+    .stat-card strong { font-size: 28px; }
+
+    .panel h3 { margin-top: 0; }
+
+    .listing {
+      border: 1px solid #e5e8ee;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .listing h4 { margin: 0 0 10px; }
+    .listing p { margin: 7px 0; line-height: 1.5; }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .approve { background: #198754; color: white; }
+    .reject { background: #dc3545; color: white; }
+
+    #message, #reportMessage, #approvedMessage { margin: 15px 0; color: #555; }
+    .report-meta { color: #777; font-size: 13px; }
+
+    .dismiss { background: #6c757d; color: white; }
+
+    .panel + .panel { margin-top: 25px; }
+
+    a { color: #1d6bb5; overflow-wrap: anywhere; }
+
+    @media (max-width: 550px) {
+      header { padding: 15px; }
+      .stats { grid-template-columns: 1fr; }
+      .actions button { flex: 1; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h2>Thai2Cairo Admin</h2>
+    <button class="logout" id="logoutButton">ออกจากระบบ</button>
+  </header>
+
+  <main>
+    <h2>ภาพรวม</h2>
+
+    <section class="stats">
+      <div class="stat-card">
+        <p>ประกาศทั้งหมด</p>
+        <strong id="totalCount">-</strong>
+      </div>
+
+      <div class="stat-card">
+        <p>รออนุมัติ</p>
+        <strong id="pendingCount">-</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>ประกาศรออนุมัติ</h3>
+      <p id="message">กำลังโหลดข้อมูล...</p>
+            <div id="listingContainer"></div>
+    </section>
+
+    <section class="panel">
+      <h3>รายงานรอตรวจสอบ</h3>
+      <p id="reportMessage">กำลังโหลดข้อมูล...</p>
+            <div id="reportContainer"></div>
+    </section>
+
+    <section class="panel">
+      <h3>ประกาศที่อนุมัติแล้ว</h3>
+      <p id="approvedMessage">กำลังโหลดข้อมูล...</p>
+      <div id="approvedContainer"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase.js"></script>
+  <script src="../assets/js/admin.js"></script>
+
+</body>
+</html>
