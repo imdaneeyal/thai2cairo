@@ -304,7 +304,6 @@
     .report-submit {
       background: #176b9a;
     }
-  </style>
 
   </style>
 </head>
@@ -320,8 +319,8 @@
 
 <main class="container">
 
-  <a href="listings.html" class="back-link">
-    ← กลับไปหน้าประกาศทั้งหมด
+  <a href="index.html" class="back-link">
+    ← กลับไปหน้าแรก
   </a>
 
   <div id="detailContainer">
@@ -401,12 +400,15 @@ function formatDate(dateString) {
         currency,
         category,
         description,
-        contact_method,
-        contact_url
+                contact_method,
+        contact_url,
+        poster_type,
+        dropoff_point,
+        pickup_point
       `)
       .eq("id", id)
       .eq("status", "approved")
-      .gte("travel_date", new Date().toISOString().slice(0, 10))
+      .gt("travel_date", new Date().toISOString().slice(0, 10))
       .maybeSingle();
 
     if (error) {
@@ -486,7 +488,7 @@ function formatDate(dateString) {
       item.capacity_kg == null ? "-" : item.capacity_kg + " กก."
     );
 
-    addInfoRow(
+            addInfoRow(
       card,
       "ราคา",
       item.price_per_kg == null
@@ -494,35 +496,26 @@ function formatDate(dateString) {
         : item.price_per_kg + " " + (item.currency || "")
     );
 
-    if (item.description) {
-      const descriptionTitle = document.createElement("h2");
-      descriptionTitle.className = "section-title";
-      descriptionTitle.textContent = "รายละเอียดเพิ่มเติม";
-
-          const infoLines = [];
-
     if (item.poster_type === "traveler") {
-      infoLines.push("ประเภทผู้โพสต์: ผู้เดินทางเอง");
+      addInfoRow(card, "ประเภทผู้โพสต์", "ผู้เดินทางเอง");
     } else if (item.poster_type === "agent") {
-      infoLines.push("ประเภทผู้โพสต์: ผ่านตัวแทน");
+      addInfoRow(card, "ประเภทผู้โพสต์", "ผ่านตัวแทน");
     }
 
     if (item.dropoff_point) {
-      infoLines.push("จุดฝาก: " + item.dropoff_point);
+      addInfoRow(card, "จุดฝาก", item.dropoff_point);
     }
 
-    if (item.pickup_point) {
-      infoLines.push("จุดรับสินค้า: " + item.pickup_point);
+        if (item.pickup_point) {
+      addInfoRow(card, "จุดรับสินค้า", item.pickup_point);
     }
 
-    const infoElements = infoLines.map(function (text) {
-      const line = document.createElement("p");
-      line.className = "detail";
-      line.textContent = text;
-      return line;
-    });
+    if (item.description) {
+      const descriptionTitle = document.createElement("h2");
+      descriptionTitle.className = "section-title";
+            descriptionTitle.textContent = "รายละเอียดเพิ่มเติม";
 
-    const description = document.createElement("p");
+      const description = document.createElement("p");
       description.className = "description";
       description.textContent = item.description;
 
@@ -540,24 +533,6 @@ function formatDate(dateString) {
       card.append(contactTitle, contactMethod);
     }
 
-    if (item.contact_url) {
-      try {
-        const url = new URL(item.contact_url);
-
-        if (url.protocol === "https:" || url.protocol === "http:") {
-          const contactButton = document.createElement("a");
-          contactButton.className = "contact-button";
-          contactButton.href = url.href;
-          contactButton.target = "_blank";
-          contactButton.rel = "noopener noreferrer";
-          contactButton.textContent = "ติดต่อผู้ประกาศ";
-
-          card.appendChild(contactButton);
-        }
-      } catch (e) {
-        // ไม่แสดงลิงก์ที่ไม่ถูกต้อง
-      }
-    }
 
         card.appendChild(createReportSection(item.id));
 
@@ -570,7 +545,7 @@ function formatDate(dateString) {
     const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "report-toggle";
-        toggle.textContent = "🚩 รายงาน / แจ้งแก้ไขประกาศนี้";
+        toggle.textContent = "✏️ แก้ไข / รายงานประกาศนี้";
 
     const box = document.createElement("div");
     box.className = "report-box";

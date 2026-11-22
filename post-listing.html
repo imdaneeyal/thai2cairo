@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ลงประกาศ | Thai2Cairo</title>
+  <title>ลงประกาศ | ThaiEgyptLuggage</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -247,7 +247,7 @@
 
 <header>
   <div class="navbar">
-    <div class="logo">Thai2Cairo</div>
+    <div class="logo">ThaiEgyptLuggage</div>
     <a href="index.html">← กลับหน้าหลัก</a>
   </div>
 </header>
@@ -313,19 +313,6 @@
       <div class="field">
         <label>วันเดินทาง <span class="required">*</span></label>
         <input type="date" id="travelDate" required>
-      </div>
-
-      <div class="field">
-        <label>หมวดหมู่ <span class="required">*</span></label>
-        <select id="category" required>
-          <option value="">เลือกหมวดหมู่</option>
-          <option value="luggage">พื้นที่กระเป๋า</option>
-          <option value="buying-service">ฝากซื้อสินค้า</option>
-          <option value="marketplace">ซื้อขายสินค้า</option>
-          <option value="shipping">ขนส่งพัสดุ</option>
-          <option value="services">บริการต่าง ๆ</option>
-          <option value="announcements">ประกาศทั่วไป</option>
-        </select>
       </div>
 
       <div class="row-fields">
@@ -750,7 +737,7 @@
           p_capacity_kg: capacityValue === "" ? null : Number(capacityValue),
           p_price_per_kg: priceValue === "" ? null : Number(priceValue),
           p_currency: document.getElementById("currency").value,
-          p_category: document.getElementById("category").value,
+          p_category: "luggage", // ตอนนี้เปิดเฉพาะหมวดพื้นที่กระเป๋า
           p_description: buildDescription(),
                     p_contact_method: "Messenger",
           p_contact_url: fb.chatUrl,

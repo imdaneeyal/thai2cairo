@@ -275,7 +275,7 @@ async function loadApprovedListings() {
 
   const { data, error } = await supabaseClient
     .from("listings")
-        .select("id, title, direction, origin, destination, travel_date, capacity_kg, price_per_kg")
+            .select("id, title, direction, origin, destination, travel_date, capacity_kg, price_per_kg, description")
     .eq("status", "approved")
     .order("created_at", { ascending: false });
 
@@ -344,8 +344,48 @@ async function loadApprovedListings() {
     editButton.textContent = "แก้ราคา / น้ำหนัก";
     editButton.addEventListener("click", () => editListing(item));
 
-    actions.append(editButton, fullButton, takeDownButton);
-        card.append(title, route, date, stock, link, actions);
+        const descButton = document.createElement("button");
+    descButton.className = "dismiss";
+    descButton.textContent = "แก้รายละเอียด";
+
+    const descBox = document.createElement("div");
+    descBox.hidden = true;
+    descBox.style.marginTop = "12px";
+
+    const descInput = document.createElement("textarea");
+    descInput.value = item.description || "";
+    descInput.maxLength = 2000;
+    descInput.style.cssText =
+      "width:100%;min-height:110px;padding:10px;border:1px solid #d8dce5;" +
+      "border-radius:6px;font-family:inherit;font-size:14px;";
+
+    const descActions = document.createElement("div");
+    descActions.className = "actions";
+
+    const descSave = document.createElement("button");
+    descSave.className = "approve";
+    descSave.textContent = "บันทึก";
+    descSave.addEventListener("click", () =>
+      saveDescription(item.id, descInput.value, descSave)
+    );
+
+    const descCancel = document.createElement("button");
+    descCancel.className = "dismiss";
+    descCancel.textContent = "ยกเลิก";
+    descCancel.addEventListener("click", () => {
+      descInput.value = item.description || "";
+      descBox.hidden = true;
+    });
+
+    descActions.append(descSave, descCancel);
+    descBox.append(descInput, descActions);
+
+    descButton.addEventListener("click", () => {
+      descBox.hidden = !descBox.hidden;
+    });
+
+    actions.append(editButton, descButton, fullButton, takeDownButton);
+    card.append(title, route, date, stock, link, actions, descBox);
     approvedContainer.appendChild(card);
   });
 }
@@ -400,6 +440,29 @@ async function editListing(item) {
   }
 
   alert("แก้ไขเรียบร้อย");
+  loadApprovedListings();
+}
+
+// แก้รายละเอียดเพิ่มเติมของประกาศ
+async function saveDescription(listingId, text, button) {
+  const value = text.trim();
+
+  button.disabled = true;
+
+  const { error } = await supabaseClient
+    .from("listings")
+    .update({ description: value === "" ? null : value })
+    .eq("id", listingId);
+
+  button.disabled = false;
+
+  if (error) {
+    console.error("save description error:", error);
+    alert("บันทึกไม่สำเร็จ: " + error.message);
+    return;
+  }
+
+  alert("แก้รายละเอียดเรียบร้อย");
   loadApprovedListings();
 }
 
